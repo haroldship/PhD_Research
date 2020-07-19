@@ -23,7 +23,7 @@
 \usepackage[english]{babel}
 
 % math stuff
-\usepackage{amsmath}
+\usepackage[fleqn]{amsmath}
 \usepackage{amsfonts} % for mathbb
 \usepackage{mathtools} % loads amsmath plus other tools
 \usepackage{fixmath} % fix greek letters
@@ -112,20 +112,24 @@
 % =========================================================================
 % Mathematical and Statistical Models
 % =========================================================================
-\section{Mathematical Models}
-\label{sec:math-models}
+\section{Infectious Disease Models}
+\label{sec:infectious-disease-models}
+
+There are many mathematical models used to understand the progression of infectious diseases.
+Compartmental models divide the population into distinct groups,
+called compartments.
+We look at the number of individuals in each compartment.
+In these models,
+individuals can move from one compartment to another,
+and we are interested in the sizes of the compartments and the rates at which they change.
+\cite{bertsimas2014robust}
 
 \subsection{SIR Model}
-\label{subsec:math-models:sir}
+\label{subsec:infectious-disease-models:sir}
 
-The SIR model is a \textbf{compartmental model},
-meaning that the population is divided into distinct groups \autocite{keeling2011modeling}.
-Over time,
-the size of the group can change.
-For SIR,
-these groups are:
+The SIR model is a compartmental model with groups:
 
-\begin{tabular}{cl}
+\begin{tabular}{p{0.05\linewidth}p{0.8\linewidth}}
     $S$ & the \textbf{susceptible} group,%
     who can acquire the disease\\%
     $I$ & the \textbf{infectious} group,%
@@ -135,7 +139,7 @@ these groups are:
 \end{tabular}
 
 Individuals can go from $S$ to $I$ and from $I$ to $R$,
-as indicated in \autoref{fig:compartment-flow-sir}.
+as indicated in \Cref{fig:compartment-flow-sir}.
 
 \begin{figure}
     \begin{tikzpicture}
@@ -173,15 +177,15 @@ or \textit{data}:
 Note that $1/\gamma$ is the \textit{average infectious period}.
 
 \subsection{SEIR Model}
-\label{subsec:math-models:seir}
+\label{subsec:infectious-disease-models:seir}
 
-The SEIR model builds on the SIR model described in \autoref{subsec:math-models:sir} by adding an additional compartment $E$,
+The SEIR model builds on the SIR model described in \Cref{subsec:infectious-disease-models:sir} by adding an additional compartment $E$,
 which contains members of the population who have been acquired the disease,
 but the disease is latent in them;
 that is,
 it is in some sort of incubation period.
 They are not yet infectious.
-The progression from compartment to compartment is shown in \autoref{fig:compartment-flow-seir}.
+The progression from compartment to compartment is shown in \Cref{fig:compartment-flow-seir}.
 
 \begin{figure}
     \begin{tikzpicture}
@@ -206,8 +210,8 @@ If we assume that $N$ does not change over time,
 then without loss of generality we can assume $N=1$ in order to simplify the model.
 
 \begin{align}
-    \dt{S} & = \mu - (\beta I + \mu) S \\%
-    \dt{E} & = \beta S I - (\mu + \sigma) E \\%
+    \dt{S} & = \mu - (\beta I + \mu) S \\%
+    \dt{E} & = \beta S I - (\mu + \sigma) E \\%
     \dt{I} & = \sigma E - (\mu + \gamma) I \\%
     \dt{R} & = \gamma I - \mu R %
 \end{align}
@@ -224,21 +228,21 @@ or \textit{data}:
 \end{tabular}
 
 \subsection{Age of Infection Model}
-\label{subsec:math-models:aoi}
+\label{subsec:infectious-disease-models:aoi}
 
 Age of Infection is a discrete time compartmental model.
 
 \subsubsection{Math Model}
 
 \begin{align}
-    i(t) \sim \operatorname{Poisson} \left( R(t) \frac{S(t-1)}{N} \sum\limits_{\tau=1}^{T_G} {P_G(\tau)i(t-\tau)} \right) & \\
-    S(t) = S(t - 1) - i(t), ~t=1,\ldots,T &
+    i(t) \sim \operatorname{Poisson} \left( R(t) \frac{S(t-1)}{N} \sum\limits_{\tau=1}^{T_G} {P_G(\tau)i(t-\tau)} \right) & \label{eq:aoi-i-poisson} \\
+    S(t) = S(t - 1) - i(t), ~t=1,\ldots,T \label{eq:aoi-s-recurrence} &
 \end{align}
 
-\begin{tabular}{ll}
+\begin{tabular}{p{0.1\linewidth}p{0.75\linewidth}}
     $N$ & population size \\
-    $i(t)$ &  number of newly infected on day $t$ \\
-    Once infected, infectious for $d$ days
+    $i(t)$ &  number of newly infected on day $t$.
+    Once infected, infectious for $d$ days. \\
     $i(t-\tau)$ & the number of infective people with age-of-infection $\tau$ on day $t$ \\
     $P_{\tau}$ & the probability that infective person with age-of-infection $\tau$ infects a susceptible that they meet \\
     $\beta$ & number of contacts per day \\
@@ -248,7 +252,7 @@ Age of Infection is a discrete time compartmental model.
     $R(t)$ &  the reproductive number on day $t$ \\
 \end{tabular}
 
-The initial conditions for the model are $i(0)$ (a vector of length $T_G$) and $S(0)$ (a scalar)
+The initial conditions for the model are $i(0)$ (a vector of length $T_G$) and $S(0)$ (a scalar).
 
 \subsubsection{Observation Model}
 
@@ -256,43 +260,78 @@ The initial conditions for the model are $i(0)$ (a vector of length $T_G$) and $
     Y(t) \sim \operatorname { Poisson }\left(p_{Y} \sum_{\tau=1}^{T_{Y}} P_{Y}(\tau) i(t-\tau)\right)
 \end{equation}
 
-\begin{tabular}{ll}
-    $Y(t)$ & the number of **newly **observed cases on day $t$ (confirmed / hospitalized / dead). \\
-    $i(t)$ & the number of newly infected individuals on day $t$ given by the epidemic model. \\
-    $p_Y$ & the probability of an infected case to be observed as $Y$ (detection rate / hospitalization rate / death rate). \\
-    $P_Y$ & the time distribution from infection to observation of $Y$ (time to detection / time to hospitalization ...) \\
+\begin{tabular}{p{0.1\linewidth}p{0.75\linewidth}}
+    $Y(t)$ & the number of newly observed cases on day $t$ (confirmed / hospitalized / dead). \\
+    $i(t)$ & the number of newly infected individuals on day $t$ given by the epidemic model. \\
+    $p_Y$ & the probability of an infected case to be observed as $Y$ (detection rate / hospitalization rate / death rate). \\
+    $P_Y$ & the time distribution from infection to observation of $Y$ (time to detection / time to hospitalization ...) \\
 \end{tabular}
 
-\subsubsection{Identifiability}
+\subsubsection{Identifiability of R(t)}
 
-The simple case:
+Under what conditions can we estimate $R(t)$?
+In other words,
+can we provide necessary and sufficient conditions,
+under which we can estimate $R(t)$ from samples taken over time?
+In particular,
+we want to avoid a situation where two functions $R_1(t), R_2(t)$,
+with $R_1(t) \neq R_2(t)$,
+do not generate samples $Y_1$, $Y_2$ with the same distribution.
+If it is the case that these samples have the same distribution,
+we cannot identify which of the functions generated the samples
+and is therefore the correct one.
 
-\begin{tabular}{ll}
-    $i(t) \sim \operatorname{Poisson} \left( R(t) \frac{S(t-1)}{N} \sum\limits_{\tau=1}^{T_G} {P_G(\tau)i(t-\tau)} \right)$ & new cases on day $t$ \\
-    $S(t) = S(t - 1) - i(t), ~t=1,\ldots,T$ & susceptible on day $t$ \\
-    $Y(t) \sim \operatorname { Poisson }\left(p_{Y} \sum_{\tau=1}^{T_{Y}} P_{Y}(\tau) i(t-\tau)\right)$ & observed cases on day $t$ \\
-\end{tabular}
+\paragraph{The simplest model}
+
+We begin with the simple system:
+
+\begin{align}
+    i(t) & \sim  \operatorname{Poisson} \left( R(t) \frac{S(t-1)}{N} \sum\limits_{\tau=1}^{T_G} {P_G(\tau)i(t-\tau)} \right) ~\text{new cases on day} ~ t & \\
+    S(t) & = S(t - 1) - i(t), ~t=1,\ldots,T ~  \text{susceptible on day} ~ t & \\
+    Y(t) & \sim \operatorname { Poisson }\left(p_{Y} \sum_{\tau=1}^{T_{Y}} P_{Y}(\tau) i(t-\tau)\right) ~ \text{observed cases on day} ~ t &
+\end{align}
+
+Under the following assumptions:
 
 \begin{assumption}
+    \label{assm:i-normal}
     $i(t)$ above is large enough that it can be approximated by Normal distribution
 \end{assumption}
 \begin{assumption}
+    \label{assm:pg=1}
     $P_G(0) = 1, P_G(t) = 0, t > 0$
 \end{assumption}
 \begin{assumption}
+    \label{assm:py=1}
     $p_Y = 1, P_Y(0) = 1$, $P_Y(t) = 0, t > 0$ so that $Y(t) = i(t)$
 \end{assumption}
 \begin{assumption}
+    \label{assm:s=N}
     $S(t-1) \approx N$ that is $S(t-1)/N \approx 1$
 \end{assumption}
 
-Then $Y(t) = R(t) i(t-1) + \epsilon_t$ where $\epsilon_t \sim N(0, R(t))$.
-The least squares estimate $\hat{R}(t) = \mathop{\mathrm{argmin}}\limits_{R \in \mathcal{R}} \sum\limits_{t=1}^{T} {\left( Y(t) - R(t)i(t-1) \right)^2}$
+We then derive the following basic model:
+\begin{align}
+    i(t) & = R(t) i(t-1) + \epsilon_t ~ \text{where} ~ \epsilon_t \sim N(0, R(t)i(t-1)) & \nonumber \\
+    S(t) & = S(t - 1) - i(t), ~t=1,\ldots,T & \nonumber \\
+    Y(t) & = R(t) i(t-1) + \epsilon_t ~ \text{where} ~ \epsilon_t \sim N(0, R(t)i(t-1))  \label{eq:Y-basic} &
+\end{align}
+
+The least squares estimate of \Cref{eq:Y-basic} is:
+\begin{equation}
+    \label{eq:r-hat-basic}
+    \hat{R}(t) = \mathop{\mathrm{argmin}}\limits_{R \in \mathbb{R}} \sum\limits_{t=1}^{T} {\left( Y(t) - R(t)i(t-1) \right)^2}
+\end{equation}
+
 If $R(t) = \beta$ is constant, then:
-$\hat{\beta} = \left(X^{\top} X\right)^{-1}X^{\top} Y$  where:
-$X = (i(0), \ldots, i(T-1))^{\top}$,
-$Y = (Y(1), \ldots, Y(T))^{\top}$
-$\operatorname{Var}(\hat{\beta}) = \frac{\sum{\sigma^2(t)}}{\sum{i(t)^2}}$
+$$\hat{\beta} = \left(X^{\top} X\right)^{-1}X^{\top} Y$$
+where:
+
+\begin{align*}
+    X & = (i(0), \ldots, i(T-1))^{\top} \text{,} \\
+    Y & = (Y(1), \ldots, Y(T))^{\top} \text{,} \\
+    \operatorname{Var}(\hat{\beta}) & = \frac{\sum{\sigma^2(t)}}{\sum{i(t)^2}}
+\end{align*}
 
 So $\beta$ is identifiable if and only if $(X^{\top}X)$ is of full rank.
 Next, consider dividing $[0,T]$ into 2 sub-intervals $[0, T^{*}]$ and $[T_{*}, T]$, with
@@ -307,7 +346,21 @@ $$
 where $T^{*}$ is known.
 Then $\beta = (\beta_1, \beta_2)$ is identifiable if each of $\beta_1, \beta_2$ are identifiable as above.
 More generally, suppose $R(t) = (\beta_1, \ldots, \beta_k), k \ll T$ on intervals $[0, T_1], \ldots, [T_{k-1}, T_k]$. Then $\beta$ is identifiable if each of the $\beta_j$ are identifiable on $[T_{j-1}, T_j]$.
-Suppose there is parameter vector $\theta$ such that $R(t) = f(t; \theta)$.
+
+\paragraph{Relaxing \Cref{assm:pg=1}}
+
+Suppose we relax \Cref{assm:pg=1}, meaning that the generation time of the disease is distributed over two days.
+Let us write $P_{G} = (P_1, P_2)$ where $P_j$ is the probability that the generation time is $j$ days.
+Note that $P_1, P_2 > 0$ and $P_1 + P_2 = 1$.
+Then we have the following problem set:
+
+\begin{align}
+    i(t) & = R(t) \left(P_{1} i(t-1)+P_{2} i(t-2) \right)+\epsilon_{t} ~ \text{where} ~ \epsilon_t \sim N(0, \sigma_t^2) & \\
+    S(t) & = S(t - 1) - i(t), ~t=1,\ldots,T & \nonumber \\
+    Y(t) & = R(t) \left(P_{1} i(t-1)+P_{2} i(t-2) \right)+\epsilon_{t} ~ \text{where} ~ \epsilon_t \sim N(0, \sigma_t^2)  \label{eq:Y-relax-assm-1} &
+\end{align}
+
+where $\sigma_t^2 = R(t) \left(P_{1} i(t-1)+P_{2} i(t-2) \right)$.
 
 
 
