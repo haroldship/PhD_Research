@@ -276,5 +276,6 @@ TSWLatexianTemp*
 # Makeindex log files
 *.lpz
 
-# data
+# ignored directories
 data/
+.ipynb_checkpoints/
