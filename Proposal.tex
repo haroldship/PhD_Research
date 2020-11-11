@@ -1,4 +1,6 @@
 % !TeX root = Proposal.tex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = en_US
 
 % =========================================================================
 %
@@ -48,6 +50,7 @@
 
 % Glossary, acronym
 \usepackage[acronym,toc,nonumberlist]{glossaries}
+\loadglsentries{glossary}
 \makeglossaries
 
 % drawings
@@ -90,20 +93,44 @@
 \listoffigures \clearpage
 \listoftables \clearpage
 \fi
-\printglossary[type=\acronymtype] \clearpage
+\printglossaries \clearpage
 
 
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-%\begin{abstract}
-%
-%\end{abstract}
 
-% \include{infectious_disease_models}
+%=================================================================
+% Introduction
+%=================================================================
+\section{Introduction}
+\label{sec:introduction}
+
+
+
+
+%=================================================================
+% Problem statement
+%=================================================================
+\section{Problem statement}
+\label{sec:problem-statement}
+
+%=================================================================
+% Objectives and impact
+%=================================================================
+\section{Overview of objectives and expected impact}
+\label{sec:objectives-impact}
+
 
 \include{neural_odes}
 
+\include{clp_param_est}
+
+%=================================================================
+% Preliminary research
+%=================================================================
+\section{Preliminary research}
+\label{sec:preliminary-research}
 
 
 \printbibliography

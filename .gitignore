@@ -279,3 +279,6 @@ TSWLatexianTemp*
 # ignored directories
 data/
 .ipynb_checkpoints/
+
+.DS_Store/
+.DS_Store
