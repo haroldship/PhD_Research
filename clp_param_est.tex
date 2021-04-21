@@ -1,0 +1,95 @@
+% !TeX root = Proposal.tex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = en_US
+
+%=================================================================
+% CLPs
+%=================================================================
+\section{\Glsentrydesc{clp}}
+\label{sec:clp-param-est}
+
+
+Questions from \href{https://www.darpa.mil/work-with-us/heilmeier-catechism}{The Heilmeier Catechism}:
+
+\begin{enumerate}
+    \item \label{q:heilmeier-what} What are you trying to do? Articulate your objectives using absolutely no jargon.
+
+    We are trying to expand on the work of \cite{chen2018neural}.
+    Rather than backpropagation,
+    we would like to develop a technique based on state-of-the-art \gls{ode} parameter estimation.
+
+    Next,
+    we plan to take advantage of the mathematical model described by the \gls{ode} in order to explain the physical system described by the problem. \textcolor{red}{write a math model}
+
+    Finally, we will build on the explainability of the model to investigate the conditions for and implications of causality in the system.
+
+    \item \label{q:heilmeier-today} How is it done today, and what are the limits of current practice?
+
+    Today,
+    deep-learning systems provide excellent results in many applications.
+    One disadvantage of deep-learning is that the model is like a black box:
+    what goes on inside is unknown,
+    and therefore the model cannot easily be explained.
+
+    \item \label{q:heilmeier-new} What is new in your approach and why do you think it will be successful?
+
+    Our hope is that we can make 3 contributions:
+    \begin{enumerate}
+        \item\label{cont:extend} Extend the use of \glspl{ode} in neural networks.
+        We would combine novel modelling techniques and state-of-the-art parameter estimation methods to solve for the model parameters,
+        in order to build deep neural networks.
+        \item\label{cont:explain} Building on \cref{cont:extend},
+        we would research the potential for explaining neural networks operation.
+        \item\label{cont:causality} We would investigate how neural \glspl{ode} contribute to the causal inference of machine-learning systems.
+    \end{enumerate}
+
+    \item \label{q:heilmeier-whocares} Who cares? If you are successful, what difference will it make?
+
+    Today,
+    deep neural networks give excellent performance,
+    but are black boxes when it comes to explaining how they arrive at their answers.
+    \textcolor{red}{give examples where explaining \glspl{dnn} would be useful}
+    We hope to develop tools that can enable the explanation and interpretation of
+    \glspl{dnn}.
+    This is useful for two reasons.
+    First,
+    the predictions provided by the \gls{dnn} may be questioned by different stakeholders.
+   These stakeholders may demand an explanation if they believe the results are incorrect or unfair.
+   Second,
+   it may be possible to improve the results by manipulating the system.
+   This would be much easier to accomplish if the model and its parameters were understandable.
+
+    \item \label{q:heilmeier-risks} What are the risks?
+
+    Some risks to completing these goals:
+    \begin{enumerate}
+        \item We won't be able to apply parameter estimation to neural networks
+        \item We won't be able to interpret the results adequately
+        \item We will find an unacceptable trade-off between interpretability and performance
+        \item We won't be able to apply causal inference to our models
+    \end{enumerate}
+
+    \item \label{q:heilmeier-cost} How much will it cost?
+
+    NA
+
+    \item \label{q:heilmeier-time} How long will it take?
+
+    This should take 3 years.
+
+    \item \label{q:heilmeier-checks} What are the mid-term and final “exams” to check for success?
+
+    \begin{enumerate}
+        \item A paper on parameter estimation in neural \glspl{ode} after 1 year
+        \item A paper on explainable neural \glspl{ode} after 2 years
+        \item A paper on causality after 3 years
+        \item A doctoral thesis after 4 years
+    \end{enumerate}
+
+
+\end{enumerate}
+
+
+
+
+

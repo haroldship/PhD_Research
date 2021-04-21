@@ -2,21 +2,22 @@
 % !TeX encoding = UTF-8
 % !TeX spellcheck = en_US
 
-% =========================================================================
+%=============================================================================
 %
 % This proposal will be written as an article
 %
-% =========================================================================
+%=============================================================================
 \documentclass[11pt,a4paper,titlepage]{article}
 
 %opening
-\title{PhD Research Proposal}
+\title{Robust optimization and parameter estimation of re-entrant lines and
+    queueing networks \\ PhD Research Proposal}
 \author{Harold Ship \\ University of Haifa}
-% =========================================================================
+%=============================================================================
 %
 % This part of the preamble is the package importing and setup
 %
-% =========================================================================
+%=============================================================================
 
 
 % UTF file input
@@ -57,13 +58,15 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning}% To get more advances positioning options
 \usetikzlibrary{arrows}% To get more arrow heads
+\usetikzlibrary{shapes.geometric}% To get more shapes
+\usetikzlibrary{fit}% To fit shapes inside shapes
 
 
-% =========================================================================
+%=============================================================================
 %
 % My macros
 %
-% =========================================================================
+%=============================================================================
 \renewcommand*{\vec}[1]{\ensuremath{\bm{#1}}}%
 \newcommand*{\mat}[1]{\ensuremath{\mathrm{#1}}}%
 \newcommand*{\transpose}[1]{\ensuremath{#1^{\mathrm{T}}}}%
@@ -74,23 +77,108 @@
 \newcommand*{\optimal}[1]{\ensuremath{#1^*}}%
 \newcommand*{\uncertainset}[1]{\ensuremath{\mathcal{#1}}}%
 \newcommand*{\defnterm}[1]{\textbf{#1}}%
+% sclp math model macros
+\newcommand*{\qnet}{\ensuremath{\mathcal{N}}}%
+\newcommand*{\serv}{\ensuremath{i}}%
+\newcommand*{\nserv}{\ensuremath{I}}%
+\newcommand*{\class}{\ensuremath{j}}%
+\newcommand*{\nclass}{\ensuremath{J}}%
+\newcommand*{\queue}{\ensuremath{k}}%
+\newcommand*{\nqueue}{\ensuremath{K}}%
+
+% other macros
+\newcommand\needc{{\color{purple}\textit{(citation needed)}}}
+\newcommand\tbd{{\color{orange}\textit{TBD}}}
 
 % math theorem environments (must be after cleveref)
 \theoremstyle{definition}
 \newtheorem{assumption}{Assumption}
 \newcommand{\assumptionautorefname}{Assumption}
 
+
 \begin{document}
+
+% these styles are for tikz drawings in this section
+\tikzstyle{server}=[%
+rectangle,
+minimum height=3cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+inner xsep=1em,
+inner ysep=1em,
+text centered,
+draw=black!50
+]
+\tikzstyle{buffer}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+text centered,
+inner sep=0pt,
+draw=red!50,
+fill=red!20
+]
+\tikzstyle{input}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1.5cm,
+text centered,
+inner sep=0pt,
+draw=white!0,
+fill=white!0
+]
+\tikzstyle{output}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+text centered,
+inner sep=0pt,
+draw=white!0,
+fill=white!0
+]
+\tikzstyle{task}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+text centered,
+inner sep=0pt,
+draw=black!50,
+fill=orange!20
+]
+\tikzstyle{taskflow}=[%
+semithick,
+blue,
+below,
+->,
+>=stealth
+]
+
 
 \pagenumbering{roman}
 
-% =========================================================================
+%=============================================================================
 % Make the title page and other boilerplate
-% =========================================================================
+%=============================================================================
 \maketitle \clearpage
 \tableofcontents \clearpage
-\iffalse % remove to enable list of figures and tables
+\iffalse % remove to enable list of figures
 \listoffigures \clearpage
+\fi
+\iffalse % remove to enable list of tables
 \listoftables \clearpage
 \fi
 \printglossaries \clearpage
@@ -100,38 +188,239 @@
 \setcounter{page}{1}
 
 
-%=================================================================
+%=============================================================================
 % Introduction
-%=================================================================
+%=============================================================================
 \section{Introduction}
 \label{sec:introduction}
 
+In queueing theory,
+a re-entrant line,
+or \gls{reqn} is a queueing network where tasks can be processed by servers
+in a fixed order.
+In particular,
+the tasks can be processed by the same servers more than once.
+Each server has several buffers.
+Tasks arrive at the buffers in a predetermined order \needc.
+This is similar to \glspl{mcqn},
+in which each server has multiple buffers for processing different classes of
+tasks.
+However, the \gls{reqn} model only contains a single job class \needc.
+
+The scheduling of \gls{reqn} and \gls{mcqn} systems can be modeled and solved
+as optimization problems.
+We look at finite time horizon scheduling problems.
+We can naively model these problems as discrete tasks arriving with an arrival
+process A and a service process S.
+However,
+the resulting optimization problem is too large to solve \needc.
+In order to overcome this issue,
+we can approximate the system as a fluid flow problem,
+where the stochastic processes are replaced with \tbd{}
+under certain \tbd{} conditions.
+We can then solve the fluid flow problem using \gls{sclp} \needc,
+and apply the solution back to the original discrete network.
+
+It is often the case that the data required for optimization is known with a
+degree of uncertainty.
+In particular,
+the exogenous arrival rate and the service rate of tasks may be known only
+approximately.
+This uncertainty in these rates can arise from several sources \needc:
+\begin{itemize}
+    \item they may be difficult to measured exactly,
+    \item they may change slightly over time,
+    \item there may be changes,
+    \item it may not be possible to assign decision variables with
+        the precision of the solution,
+        causing inaccuracies to accumulate.
+\end{itemize}
+
+There are different strategies for dealing with uncertainty in
+optimization problems.
+\Gls{so} is one such strategy.
+The main idea of \gls{so} is to treat the data as random variables.
+In our case,
+this would mean the arrival rates and service rates would be treated as
+random variables.
+Usually,
+assumptions are made about the family or the distribution of these variables,
+and part of the optimization algorithm involves obtaining estimates for them.
+\Gls{so} tries to find the most likely optimal solution \needc.
+\Gls{ro} is another strategy for solving optimization problems with uncertainty
+in the data.
+In general,
+\gls{ro} uses a more conservative decision procedure than \gls{so}.
+The solution obtained,
+known as the robust solution,
+is a worst-case solution.
+This means that it is the best solution that is feasible in for all possible
+values of the data,
+where possible means within the values allowed \needc.
+The set of allowed values for the data is called the \textbf{uncertainty set}.
+
+Recently,
+there has been work on \acrlong{ro} of \gls{sclp} problems,
+in particular for \gls{mcqn}.
+The current state of the art can solve \gls{sclp} for constant data.
+However,
+there is still a lot of outstanding work.
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}[node distance=2.5cm]
+        \node[buffer] (B1) at (0,0) {$B_1$};
+        \node[buffer] (B2) [below of=B1] {$B_2$};
+        \node[buffer] (B3) [right of=B1] {$B_3$};
+        \node[buffer] (B4) [right of=B2] {$B_4$};
+        \node[input] (I1) [left of=B1] {Type 1};
+        \node[input] (I2) [left of=B2] {Type 2};
+        \node[output] (O1) [right of=B3] {};
+        \node[output] (O2) [right of=B4] {};
+        \node[server,fit=(B1) (B2)] (S1) {};
+        \node[fill=white] at (S1.north) {Server 1};
+        \node[server,fit=(B3) (B4)] (S2) {};
+        \node[fill=white] at (S2.north) {Server 2};
+        \path[taskflow] (B1) edge node {$\mu_1$} (B3);
+        \path[taskflow] (B2) edge node {$\mu_2$} (B4);
+        \path[taskflow] (I1) edge node {$\lambda$} (B1);
+        \path[taskflow] (I2) edge node {$\lambda$} (B2);
+        \path[taskflow] (B3) edge node {$\mu_3$} (O1);
+        \path[taskflow] (B4) edge node {$\mu_4$} (O2);
+    \end{tikzpicture}
+    \caption[Example queueing network with two servers.]{
+        \label{fig:queue-net}
+        Example queueing network with two servers.
+    }
+\end{figure}
+
+%=============================================================================
+% Theory
+%=============================================================================
+\section{Theory}
+\label{sec:theory}
 
 
+\subsection{\acrshort{mcqn}}
+\label{subsec:theory:mcqn}
 
-%=================================================================
-% Problem statement
-%=================================================================
-\section{Problem statement}
-\label{sec:problem-statement}
+Let $\qnet$ be a queueing network containing $i = 1, \ldots, I$
+servers operating over a finite time interval $[0,T]$.
+The servers process fluid which is divided into classes $j = 1, \ldots, J$,
+and fluid from class $j$ processed by one server $s(j) = i$.
+Fluid waits for processing in buffers $k = 1, \ldots, K$,
+and,
+once processed,
+flows from buffer $f(j) = k$.
+An conceptual example of fluid or task flows can be seen in \Cref{fig:task-flows}.
+Tasks entering $\qnet$ from the outside are called exogenous,
+and tasks of class $j$ arrive at one of the servers with a rate $a_j$.
+We use this constant rate to approximate the Poisson arrival process
+with parameter $a_j$.
 
-%=================================================================
-% Objectives and impact
-%=================================================================
-\section{Overview of objectives and expected impact}
-\label{sec:objectives-impact}
+For fluid of class $j$,
+we apply a control to server $s(j)$ at time $t$
+to process fluid at rate $u_j(t)$ per unit time,
+giving us a vector of control variables $u(t) \in \RR{J}$.
+Also at time $t$,
+the amount of fluid awaiting processing in the $k$ buffers is $x_(t)$.
+
+The specification of the basic \gls{mcqn} problem is:
+\begin{align} \label{eq:mcqn}%
+    % looks like 3 columns but is 6 as & makes a right-aligned
+    % and left-aligned pair so we have 6 columns but only use the
+    % left, right, and left from the 3 pairs
+    && \max\limits_{u(t), x(t)} &&& \int\limits_0^T(\gamma^\top +
+      (T-t)c^\top)u(t)+h^\top x(t)\mathrm{d}t \nonumber \\
+    & \mbox{MCQN} & \mbox{s.t} &&& \int\limits_0^T G u(s)\mathrm{d}s +
+%      F x(t)   \leq \alpha+at, \\
+      x(t)   \leq \alpha+at, \\
+    &&&&& H u(t) \leq b, \nonumber \\
+    &&&&& x(t), u(t) \geq 0, ~ 0 \leq t \leq T, \nonumber
+\end{align}
 
 
-\include{neural_odes}
+$\gamma \in \RR{J}$ is processing cost per job class,
+$c$ is \tbd.
+$h \in \RR{K}$ is the holding cost per buffer,
+$\alpha \in \RR{K}$ is the initial amount of fluid in the buffers
+$b \in \RR{I}$ is the maximum processing rate of the $J$ servers.
+Additionally,
+we have the matrices $G \in \RR{J \times K}$ and $H \in \RR{I \times J}$.
+$G$ describes the inflows $(1)$ and outflows ($p_{j,k}$).
+$H$ describes the service times,
+the reciprocals of the maximum service rates $\mu_j$.
 
-\include{clp_param_est}
+\begin{align}
+    G = G_{j,k} = &
+    \begin{cases}
+        1 & f(j) = k \\
+        -p_{j,k} & f(j) != k
+    \end{cases} \\
+    H = H_{i,j} = &
+\begin{cases}
+    1/\mu_j & s(j) = i \\
+    0 & s(j) != i
+\end{cases}
+\end{align}
 
-%=================================================================
-% Preliminary research
-%=================================================================
-\section{Preliminary research}
-\label{sec:preliminary-research}
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \node[task] (T1) at (0,0) {$T_1$};
+        \node[task] (T2) [below left=of T1] {$T_2$};
+        \node[task] (T3) [below right=of T1] {$T_3$};
+        \node[task] (T4) [below=of T3] {$T_4$};
+        \node[task] (T5) [below left=of T4] {$T_5$};
+        \path[taskflow] (T1) edge node {} (T2);
+        \path[taskflow] (T2) edge node {} (T5);
+        \path[taskflow] (T1) edge node {} (T3);
+        \path[taskflow] (T3) edge node {} (T4.north);
+        \path[taskflow] (T4.south) edge node {} (T5.north);
+    \end{tikzpicture}
+    \caption[Example fluid or task flows.]{
+        \label{fig:task-flows}
+        Example fluid or task flows.
+        A flow is the set of arrows coming out of a task node.
+        Task $T_1$ flows to $T_2$ and $T_3$.
+        Task $T_2$ flows straight to $T_5$.
+        Task $T_3$ flows to $T_4$,
+        which then flows to $T_5$ as well.
+    }
+\end{figure}
 
+\tbd{} Robust MCQN
+
+\tbd{} Re-entrant
+
+\tbd{} Robust re-entrant
+
+%=============================================================================
+% Questions
+%=============================================================================
+\section{Questions}
+\label{sec:questions}
+
+We would like to known the bounds of the arrival and service rates.
+If there is historical data,
+what is the state of the art on these estimates?
+
+\begin{enumerate}
+    \item How can we estimate the parameters and the uncertainty set with and
+    without historical data?
+    How can we compute the robust counterpart of \gls{sclp} from this?
+    How can we create a policy for parameter estimation that doesn't lose too
+    much in terms of the objective?
+    It may be possible to estimate the data by running a system which is far
+    from optimal.
+    In many cases this could be expensive.
+    \item Can we develop a system and method to generate policies from online
+    networks that can detect changes in the data and self-adjust?
+    \item Can we extend \gls{sclp} to piecewise constant parameters,
+    in particular the task arrival rates?
+    \item What other ways can we extend the arrival process?
+    \item How can we estimate the uncertainty set for the robust problem?
+\end{enumerate}
 
 \printbibliography
 \label{sec:bibliography}
