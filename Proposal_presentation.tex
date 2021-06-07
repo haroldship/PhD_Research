@@ -1,0 +1,487 @@
+% !TeX root = Proposal_presentation.tex
+% !TeX encoding = UTF-8
+% !TeX spellcheck = en_US
+
+%=============================================================================
+%
+% This proposal as a presentation
+%
+%=============================================================================
+\documentclass[pdf]{beamer}
+
+%opening
+\title{Optimal Control of Dynamic Workload Placement}
+\subtitle{PhD Research Proposal \\ under the supervision of \\ Dr Itai Dattner \\ Dr Evgeny Shindin}
+\author{Harold Ship}
+\institute{University of Haifa}
+%=============================================================================
+%
+% This part of the preamble is the package importing and setup
+%
+%=============================================================================
+
+
+% UTF file input
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+% math stuff
+\usepackage{amsmath}
+\usepackage{amsfonts} % for mathbb
+\usepackage{mathtools} % loads amsmath plus other tools
+\usepackage{fixmath} % fix greek letters
+\usepackage{relsize} % for \mathlarger
+\usepackage{bm}
+
+% math theorems and theorem environments
+\usepackage{amsthm}
+
+% biblatex for references
+\usepackage{csquotes} % ensures biblatex quotes things correctly
+\usepackage[backend=biber,style=apa,autocite=inline]{biblatex}
+\DeclareLanguageMapping{english}{english-apa}
+\addbibresource{../personal_bibliography.bib}
+
+% puts hyperlinks in PDF. Must be loaded before cleveref
+\usepackage{hyperref}
+\hypersetup{hypertexnames=false}
+
+% better cross-refs like Equations, etc
+\usepackage{cleveref}
+
+% Glossary, acronym
+\usepackage[acronym,toc,nonumberlist]{glossaries}
+\loadglsentries{glossary}
+\makeglossaries
+
+% drawings
+\usepackage{tikz}
+\usetikzlibrary{positioning}% To get more advances positioning options
+\usetikzlibrary{arrows}% To get more arrow heads
+\usetikzlibrary{shapes.geometric}% To get more shapes
+\usetikzlibrary{fit}% To fit shapes inside shapes
+
+
+%=============================================================================
+%
+% My macros
+%
+%=============================================================================
+\renewcommand*{\vec}[1]{\ensuremath{\bm{#1}}}%
+\newcommand*{\mat}[1]{\ensuremath{\mathrm{#1}}}%
+\newcommand*{\transpose}[1]{\ensuremath{#1^{\mathrm{T}}}}%
+\newcommand*{\dd}{\ensuremath{\mathop{}\!\mathrm{d}}}%
+\newcommand*{\dt}[1]{\ensuremath{#1^{\prime}}}%
+\newcommand*{\R}{\ensuremath{\mathop{}\!\mathbb{R}}}%
+\newcommand*{\RR}[1]{\ensuremath{\mathop{}\!\mathbb{R}^{#1}}}%
+\newcommand*{\optimal}[1]{\ensuremath{#1^*}}%
+\newcommand*{\uncertainset}[1]{\ensuremath{\mathcal{#1}}}%
+\newcommand*{\defnterm}[1]{\textbf{#1}}%
+% sclp math model macros
+\newcommand*{\qnet}{\ensuremath{\mathcal{N}}}%
+\newcommand*{\serv}{\ensuremath{i}}%
+\newcommand*{\nserv}{\ensuremath{I}}%
+\newcommand*{\class}{\ensuremath{j}}%
+\newcommand*{\nclass}{\ensuremath{J}}%
+\newcommand*{\queue}{\ensuremath{k}}%
+\newcommand*{\nqueue}{\ensuremath{K}}%
+
+% other macros
+\newcommand\needc{{\color{purple}\textit{(citation needed)}}}
+\newcommand\tbd{{\color{orange}\textit{TBD}}}
+
+% math theorem environments (must be after cleveref)
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newcommand{\assumptionautorefname}{Assumption}
+\newtheorem{question}{Research Question}
+
+
+\begin{document}
+
+% these styles are for tikz drawings in this section
+\tikzstyle{server}=[%
+rectangle,
+%minimum height=3cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+inner xsep=1em,
+inner ysep=1em,
+text centered,
+draw=black!50
+]
+\tikzstyle{buffer}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+text centered,
+inner sep=0pt,
+draw=red!50,
+fill=red!20
+]
+\tikzstyle{input}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1.5cm,
+text centered,
+inner sep=0pt,
+draw=white!0,
+fill=white!0
+]
+\tikzstyle{output}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+text centered,
+inner sep=0pt,
+draw=white!0,
+fill=white!0
+]
+\tikzstyle{task}=[%
+rectangle,
+minimum height=1cm,
+%rounded corners=4pt,
+text height=0.75cm,
+text depth=.5cm,
+text width=1cm,
+text centered,
+inner sep=0pt,
+draw=black!50,
+fill=orange!20
+]
+\tikzstyle{taskflow}=[%
+semithick,
+blue,
+below,
+->,
+>=stealth
+]
+
+
+% \pagenumbering{roman}
+
+%=============================================================================
+% Make the title page
+%=============================================================================
+\begin{frame}
+    \titlepage
+\end{frame}
+
+%=============================================================================
+% Agenda
+%=============================================================================
+\begin{frame}{Agenda}
+    \begin{itemize}
+        \item Motivation
+    \end{itemize}
+\end{frame}
+
+%=============================================================================
+% Executive summary
+%=============================================================================
+\begin{frame}{Executive summary}
+    \begin{itemize}
+        \item Executive summary
+    \end{itemize}
+\end{frame}
+
+%=============================================================================
+% Motivation
+%=============================================================================
+\section{Motivation}
+\begin{frame}{Motivation}
+    \begin{itemize}
+        \item Many applications today need to run as a collection of cooperating services
+        running on a set of computer servers.
+        \item Often,
+        these applications have requirements for processing power,
+        geographical location,
+        and specialized hardware
+        such that several computers are needed to run them.
+        \begin{itemize}
+            \item For example,
+            a support system for autonomous vehicles may consist of computing devices
+            in the cloud,
+            in fixed stations along the roads,
+            and within the vehicles themselves.
+        \end{itemize}
+
+        \item The software applications consist of several tasks.
+        Some of these may need to run on specific machines.
+        However,
+        many components can be ``placed'' on any of several machines.
+        \item In this research we address the optimization of workload placement of distributed computing tasks.
+    \end{itemize}
+\end{frame}
+
+
+%=============================================================================
+% Background
+%=============================================================================
+\begin{frame}{Background}
+    Example
+    \begin{columns}
+
+    \column{0.7\textwidth}
+    \begin{itemize}
+        \item Suppose we have an application which provides service to two locations,
+        North and South.
+        Tasks arrive according to an nonhomogeneous Poisson process,
+        with paramters $\lambda_N(t)$ and $\lambda_S(t)$.
+        \item Suppose also that there are two server machines,
+        Server 1 and Server 2,
+        each with CPU capacity $R_1,R_2$ tasks per unit time.
+        \item Requests flow from outside to a web service,
+        then to a database service,
+        then complete.
+        We wish to run a web service and a database service
+        on each server.
+        \item We assign a job class $j$ to each service as indicated in the table and $s(j) = i$ is the associated server.
+    \end{itemize}
+
+    \column{0.3\textwidth}
+    \begin{table}
+        \begin{tabular}{ccc}
+            Server & Role & $j$ \\
+            \hline
+             1 & Web & 1 \\
+             2 & Web & 2 \\
+             1 & DB & 3 \\
+             2 & DB & 4
+        \end{tabular}
+    \end{table}
+
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}{Background - Setup}
+    \begin{columns}
+
+        \column{0.6\textwidth}
+        \begin{itemize}
+            \item Each service has a buffer,
+            indicated by $B_1, \ldots, B_4$.
+            \item We write $a_j(t)$ as the exogenous task input rate of class $j$.
+            In this example,
+            $a_1(t) = \lambda_N(t)$, $a_2(t) = \lambda_S(t)$,
+            $a_3(t) = a_4(t) = 0$.
+            This represents the requests to the web servers.
+            \item Once a web server processes a request from its buffer,
+            it sends the request to a database server.
+            We label the rate that completed tasks of class
+            $j$ flow into buffer $k$ as
+            $g_{j,k}$.
+        \end{itemize}
+
+        \column{0.4\textwidth}
+        \begin{figure}
+            \centering
+            \resizebox{\textwidth}{!}{
+                \begin{tikzpicture}[node distance=2.5cm]
+                    \node[buffer] (B1) at (0,0) {$B_1$};
+                    \node[buffer] (B2) [below of=B1] {$B_2$};
+                    \node[buffer] (B3) [right of=B1] {$B_3$};
+                    \node[buffer] (B4) [right of=B2] {$B_4$};
+                    \node[input] (I1) [left of=B1] {};
+                    \node[input] (I2) [left of=B2] {};
+                    \node[output] (O1) [right of=B3] {};
+                    \node[output] (O2) [right of=B4] {};
+                    \node[server,fit=(B1) (B3)] (S1) {};
+                    \node[fill=white] at (S1.north) {Server 1};
+                    \node[server,fit=(B2) (B4)] (S2) {};
+                    \node[fill=white] at (S2.south) {Server 2};
+%                    \path[taskflow] (B1) edge node {$\mu_{1,3}$} (B3);
+                    \path[taskflow,above left] (B1) edge node {$g_{1,4}$} (B4);
+                    \path[taskflow, below left] (B2) edge node {$g_{2,3}$} (B3);
+%                    \path[taskflow] (B2) edge node {$\mu_{2,4}$} (B4);
+                    \path[taskflow] (I1) edge node {$a_1$} (B1);
+                    \path[taskflow] (I2) edge node {$a_2$} (B2);
+                    %\path[taskflow] (B3) edge node {$\mu_3$} (O1);
+                    %\path[taskflow] (B4) edge node {$\mu_4$} (O2);
+                \end{tikzpicture}
+            }% resizebox
+            \caption[Example queueing network with two servers.]{
+                \label{fig:queue-net}
+                Example queueing network with two servers.
+            }
+        \end{figure}
+
+    \end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Variables and Cost function}
+        \begin{itemize}
+            \item Suppose we are interested in minimizing the total waiting time
+            of tasks in buffers in a time interval $[0,T]$.
+            \item Let $x = x_j(t), j=1,\ldots, 4$ denote the number of tasks at time $t$ in buffers $B_1, \ldots, B_4$.
+            \item Each task has a lifetime $\tau_j$ which is an exponential process,
+            meaning the tasks ``complete'' according to a Poisson process with parameter $\mu_j$.
+            \item It costs $d_j$ per unit time for a task of class $j$ to remain in the buffer.
+            \item $u = u_j, i=j,\ldots,4$ is the CPU percent at time $t$ to work on tasks from buffer $B_1, \ldots, B_4$.
+            \item It costs $\gamma_j$ per unit time for server $s(j)$ to process a task of class $j$.
+        \end{itemize}
+
+        Cost Function:
+        $
+        \int\limits_0^T \left(\sum\limits_{j=1}^4 \gamma_j u_j(t) + d_j x_j(t) \right) \textrm{d}t
+        $
+
+\end{frame}
+
+
+\begin{frame}{CPU Constraints}
+        Remember $R_1,~R_2$ are the CPU capacities of Servers 1,2
+
+        $$
+        u_1(t) + u_3(t) \leq R_1 ~ \forall t \in [0,T]
+        $$
+
+        $$
+        u_2(t) + u_4(t) \leq R_2 ~ \forall t \in [0,T]
+        $$
+
+
+
+\end{frame}
+
+
+\begin{frame}{CPU Constraints}
+
+
+$$
+x_1(t) = x_1(0) + \int_0^t \left( a_1(s) - g_{1,1} u_1(s) \right) \textrm{d}s
+$$
+
+$$
+x_2(t) = x_2(0) + \int_0^t \left( a_2(s) - g_{2,2} u_2(s) \right) \textrm{d}s
+$$
+
+$$
+x_3(t) = x_3(0) + \int_0^t \left( a_3(s) - g_{3,3} u_3(s) + g_{1,4} u_4(s) \right) \textrm{d}s
+$$
+
+$$
+x_3(t) = x_3(0) + \int_0^t \left( a_4(s) - g_{4,4} u_4(s)  + g_{2,3} u_3(s)\right) \textrm{d}s
+$$
+
+\end{frame}
+
+\begin{frame}{\acrshort{sclp}}
+        \begin{itemize}
+            \item This problem is too large to solve using discrete methods.
+            \item We approximate the discrete Poisson processes of each task flow with constant values,
+            equal to the respective means.
+            \item We can transform our model so that \Gls{sclp} to solve it.
+            \item One of our research goals is to extend \gls{sclp} to work with piece-wise constant values for the exogenous task arrival rates.
+        \end{itemize}
+\end{frame}
+
+
+%=============================================================================
+% Statistical model
+%=============================================================================
+\begin{frame}{Statistical model}
+
+    In a given distributed system we \textbf{observe} values for:
+
+    \begin{itemize}
+
+        \item the arrival rate $a$ of exogenous tasks of each class over fixed time intervals,
+        that is as piece-wise constant values over a time period $[0,T]$,
+        and
+
+        \item at least one of:
+
+        \begin{itemize}
+            \item the number of tasks in the buffers $x_j$ at times
+            $t_1, \ldots, t_N \in [0,T]$ for each class $j$
+            \item the task outflow rates $g_{j,k}$ when $j \neq k$.
+        \end{itemize}
+
+    \end{itemize}
+\end{frame}
+
+
+%=============================================================================
+% Research objective
+%=============================================================================
+\begin{frame}{Research objective}
+    \begin{itemize}
+        \item The objective of this research is to analyze Workload Placement problems
+        containing uncertainty in the task arrival rate,
+        the task flow rates,
+        and the objective function.
+        \item In particular,
+        we plan to develop an iterative methodology for simultaneously  optimizing Workload Placement problems while estimating the parameters of these problems.
+    \end{itemize}
+\end{frame}
+
+%=============================================================================
+% Research questions
+%=============================================================================
+\begin{frame}{Research questions}
+
+    \begin{question}
+        Can we extend our \gls{sclp} algorithm to solve problems with piece-wise constant task arrival rates?
+    \end{question}
+
+    \begin{question}
+        How can we solve workload placement problems using \gls{sclp} while simultaneously estimating the task arrival rate?
+    \end{question}
+
+    \begin{question}
+        How can we solve workload placement problems using \gls{sclp} while simultaneously estimating the task outflow rates?
+    \end{question}
+
+    \begin{question}
+        How can we solve workload placement problems using \gls{sclp} while simultaneously estimating a penalty threshold in the cost function?
+    \end{question}
+
+\end{frame}
+
+
+%=============================================================================
+% Work in progress
+%=============================================================================
+\begin{frame}{Work in progress}
+
+    \begin{enumerate}
+        \item Theory
+
+        \begin{itemize}
+            \item \Gls{sclp}
+            \item \Gls{ro}
+            \item \Gls{so}
+            \item Parameter estimation for \Glspl{ode}
+            \item Stochastic processes
+        \end{itemize}
+
+        \item Implementation
+        \begin{itemize}
+            \item \Gls{sclp} for workload placement
+            \item Monte Carlo simulations of Workload Placement problems
+            \item Extensions to \gls{sclp} for piece-wise constant arrival rates
+            \item Extensions to \gls{sclp} for penalties in objective function
+        \end{itemize}
+
+    \end{enumerate}
+
+\end{frame}
+
+
+\end{document}

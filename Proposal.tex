@@ -194,105 +194,127 @@ below,
 \section{Introduction}
 \label{sec:introduction}
 
-In queueing theory,
-a re-entrant line,
-or \gls{reqn} is a queueing network where tasks can be processed by servers
-in a fixed order.
-In particular,
-the tasks can be processed by the same servers more than once.
-Each server has several buffers.
-Tasks arrive at the buffers in a predetermined order \needc.
-This is similar to \glspl{mcqn},
-in which each server has multiple buffers for processing different classes of
-tasks.
-However, the \gls{reqn} model only contains a single job class \needc.
+%In queueing theory,
+%a re-entrant line,
+%or \gls{reqn} is a queueing network where tasks can be processed by servers
+%in a fixed order.
+%In particular,
+%the tasks can be processed by the same servers more than once.
+%Each server has several buffers.
+%Tasks arrive at the buffers in a predetermined order \needc.
+%This is similar to \glspl{mcqn},
+%in which each server has multiple buffers for processing different classes of
+%tasks.
+%However, the \gls{reqn} model only contains a single job class \needc.
+%
+%The scheduling of \gls{reqn} and \gls{mcqn} systems can be modeled and solved
+%as optimization problems.
+%We look at finite time horizon scheduling problems.
+%We can naively model these problems as discrete tasks arriving with an arrival
+%process A and a service process S.
+%However,
+%the resulting optimization problem is too large to solve \needc.
+%In order to overcome this issue,
+%we can approximate the system as a fluid flow problem,
+%where the stochastic processes are replaced with \tbd{}
+%under certain \tbd{} conditions.
+%We can then solve the fluid flow problem using \gls{sclp} \needc,
+%and apply the solution back to the original discrete network.
+%
+%It is often the case that the data required for optimization is known with a
+%degree of uncertainty.
+%In particular,
+%the exogenous arrival rate and the service rate of tasks may be known only
+%approximately.
+%This uncertainty in these rates can arise from several sources \needc:
+%\begin{itemize}
+%    \item they may be difficult to measured exactly,
+%    \item they may change slightly over time,
+%    \item there may be changes,
+%    \item it may not be possible to assign decision variables with
+%        the precision of the solution,
+%        causing inaccuracies to accumulate.
+%\end{itemize}
+%
+%There are different strategies for dealing with uncertainty in
+%optimization problems.
+%\Gls{so} is one such strategy.
+%The main idea of \gls{so} is to treat the data as random variables.
+%In our case,
+%this would mean the arrival rates and service rates would be treated as
+%random variables.
+%Usually,
+%assumptions are made about the family or the distribution of these variables,
+%and part of the optimization algorithm involves obtaining estimates for them.
+%\Gls{so} tries to find the most likely optimal solution \needc.
+%\Gls{ro} is another strategy for solving optimization problems with uncertainty
+%in the data.
+%In general,
+%\gls{ro} uses a more conservative decision procedure than \gls{so}.
+%The solution obtained,
+%known as the robust solution,
+%is a worst-case solution.
+%This means that it is the best solution that is feasible in for all possible
+%values of the data,
+%where possible means within the values allowed \needc.
+%The set of allowed values for the data is called the \textbf{uncertainty set}.
+%
+%Recently,
+%there has been work on \acrlong{ro} of \gls{sclp} problems,
+%in particular for \gls{mcqn}.
+%The current state of the art can solve \gls{sclp} for constant data.
+%However,
+%there is still a lot of outstanding work.
+%
+%\begin{figure}
+%    \centering
+%    \begin{tikzpicture}[node distance=2.5cm]
+%        \node[buffer] (B1) at (0,0) {$B_1$};
+%        \node[buffer] (B2) [below of=B1] {$B_2$};
+%        \node[buffer] (B3) [right of=B1] {$B_3$};
+%        \node[buffer] (B4) [right of=B2] {$B_4$};
+%        \node[input] (I1) [left of=B1] {Type 1};
+%        \node[input] (I2) [left of=B2] {Type 2};
+%        \node[output] (O1) [right of=B3] {};
+%        \node[output] (O2) [right of=B4] {};
+%        \node[server,fit=(B1) (B2)] (S1) {};
+%        \node[fill=white] at (S1.north) {Server 1};
+%        \node[server,fit=(B3) (B4)] (S2) {};
+%        \node[fill=white] at (S2.north) {Server 2};
+%        \path[taskflow] (B1) edge node {$\mu_1$} (B3);
+%        \path[taskflow] (B2) edge node {$\mu_2$} (B4);
+%        \path[taskflow] (I1) edge node {$\lambda$} (B1);
+%        \path[taskflow] (I2) edge node {$\lambda$} (B2);
+%        \path[taskflow] (B3) edge node {$\mu_3$} (O1);
+%        \path[taskflow] (B4) edge node {$\mu_4$} (O2);
+%    \end{tikzpicture}
+%    \caption[Example queueing network with two servers.]{
+%        \label{fig:queue-net}
+%        Example queueing network with two servers.
+%    }
+%\end{figure}
+%
+%
 
-The scheduling of \gls{reqn} and \gls{mcqn} systems can be modeled and solved
-as optimization problems.
-We look at finite time horizon scheduling problems.
-We can naively model these problems as discrete tasks arriving with an arrival
-process A and a service process S.
-However,
-the resulting optimization problem is too large to solve \needc.
-In order to overcome this issue,
-we can approximate the system as a fluid flow problem,
-where the stochastic processes are replaced with \tbd{}
-under certain \tbd{} conditions.
-We can then solve the fluid flow problem using \gls{sclp} \needc,
-and apply the solution back to the original discrete network.
+Many applications today need to run as a collection of cooperating services
+running on a set of computer servers.
+The reasons for this are many and varied.
+There are applications which require more computing power than is available on
+a single computer,
+and the most economical way to run it is to distribute the workload across
+multiple machines.
+Deep neural networks are an example,
+where training is conducted on many computers in parallel.
+In other cases,
+different functions in a complex system, or system of systems may run on
+heterogeneous computing devices.
 
-It is often the case that the data required for optimization is known with a
-degree of uncertainty.
-In particular,
-the exogenous arrival rate and the service rate of tasks may be known only
-approximately.
-This uncertainty in these rates can arise from several sources \needc:
-\begin{itemize}
-    \item they may be difficult to measured exactly,
-    \item they may change slightly over time,
-    \item there may be changes,
-    \item it may not be possible to assign decision variables with
-        the precision of the solution,
-        causing inaccuracies to accumulate.
-\end{itemize}
 
-There are different strategies for dealing with uncertainty in
-optimization problems.
-\Gls{so} is one such strategy.
-The main idea of \gls{so} is to treat the data as random variables.
-In our case,
-this would mean the arrival rates and service rates would be treated as
-random variables.
-Usually,
-assumptions are made about the family or the distribution of these variables,
-and part of the optimization algorithm involves obtaining estimates for them.
-\Gls{so} tries to find the most likely optimal solution \needc.
-\Gls{ro} is another strategy for solving optimization problems with uncertainty
-in the data.
-In general,
-\gls{ro} uses a more conservative decision procedure than \gls{so}.
-The solution obtained,
-known as the robust solution,
-is a worst-case solution.
-This means that it is the best solution that is feasible in for all possible
-values of the data,
-where possible means within the values allowed \needc.
-The set of allowed values for the data is called the \textbf{uncertainty set}.
+Workload placement problems.
+Queueing theory.
+SCLP can solve them.
 
-Recently,
-there has been work on \acrlong{ro} of \gls{sclp} problems,
-in particular for \gls{mcqn}.
-The current state of the art can solve \gls{sclp} for constant data.
-However,
-there is still a lot of outstanding work.
 
-\begin{figure}
-    \centering
-    \begin{tikzpicture}[node distance=2.5cm]
-        \node[buffer] (B1) at (0,0) {$B_1$};
-        \node[buffer] (B2) [below of=B1] {$B_2$};
-        \node[buffer] (B3) [right of=B1] {$B_3$};
-        \node[buffer] (B4) [right of=B2] {$B_4$};
-        \node[input] (I1) [left of=B1] {Type 1};
-        \node[input] (I2) [left of=B2] {Type 2};
-        \node[output] (O1) [right of=B3] {};
-        \node[output] (O2) [right of=B4] {};
-        \node[server,fit=(B1) (B2)] (S1) {};
-        \node[fill=white] at (S1.north) {Server 1};
-        \node[server,fit=(B3) (B4)] (S2) {};
-        \node[fill=white] at (S2.north) {Server 2};
-        \path[taskflow] (B1) edge node {$\mu_1$} (B3);
-        \path[taskflow] (B2) edge node {$\mu_2$} (B4);
-        \path[taskflow] (I1) edge node {$\lambda$} (B1);
-        \path[taskflow] (I2) edge node {$\lambda$} (B2);
-        \path[taskflow] (B3) edge node {$\mu_3$} (O1);
-        \path[taskflow] (B4) edge node {$\mu_4$} (O2);
-    \end{tikzpicture}
-    \caption[Example queueing network with two servers.]{
-        \label{fig:queue-net}
-        Example queueing network with two servers.
-    }
-\end{figure}
 
 %=============================================================================
 % Theory
@@ -331,10 +353,10 @@ The specification of the basic \gls{mcqn} problem is:
     % and left-aligned pair so we have 6 columns but only use the
     % left, right, and left from the 3 pairs
     && \max\limits_{u(t), x(t)} &&& \int\limits_0^T(\gamma^\top +
-      (T-t)c^\top)u(t)+h^\top x(t)\mathrm{d}t \nonumber \\
+      (T-t)c^\top)u(t)+d^\top x(t)\mathrm{d}t \nonumber \\
     & \mbox{MCQN} & \mbox{s.t} &&& \int\limits_0^T G u(s)\mathrm{d}s +
-%      F x(t)   \leq \alpha+at, \\
-      x(t)   \leq \alpha+at, \\
+      F x(t) = \alpha+at, \\
+%      x(t)   \leq \alpha+at, \\
     &&&&& H u(t) \leq b, \nonumber \\
     &&&&& x(t), u(t) \geq 0, ~ 0 \leq t \leq T, \nonumber
 \end{align}
@@ -342,25 +364,26 @@ The specification of the basic \gls{mcqn} problem is:
 
 $\gamma \in \RR{J}$ is processing cost per job class,
 $c$ is \tbd.
-$h \in \RR{K}$ is the holding cost per buffer,
+$d \in \RR{K}$ is the holding cost per buffer,
 $\alpha \in \RR{K}$ is the initial amount of fluid in the buffers
 $b \in \RR{I}$ is the maximum processing rate of the $J$ servers.
 Additionally,
 we have the matrices $G \in \RR{J \times K}$ and $H \in \RR{I \times J}$.
 $G$ describes the inflows $(1)$ and outflows ($p_{j,k}$).
-$H$ describes the service times,
+$F$ describes which buffers belong to which server,
+while $H$ describes the service times $\tau_j$ for each job class,
 the reciprocals of the maximum service rates $\mu_j$.
 
 \begin{align}
     G = G_{j,k} = &
     \begin{cases}
         1 & f(j) = k \\
-        -p_{j,k} & f(j) != k
+        -p_{j,k} & f(j) \neq k
     \end{cases} \\
     H = H_{i,j} = &
 \begin{cases}
     1/\mu_j & s(j) = i \\
-    0 & s(j) != i
+    0 & s(j) \neq i
 \end{cases}
 \end{align}
 
@@ -388,6 +411,82 @@ the reciprocals of the maximum service rates $\mu_j$.
         which then flows to $T_5$ as well.
     }
 \end{figure}
+
+
+%=============================================================================
+% Workload Placement Example
+%=============================================================================
+\subsection{Workload Placement Example}
+\label{subseq:theory:workload-placement}
+
+Suppose we have a computerized workload that we would like to run on a set of $I$ networked servers.
+The workload we wish to run is made up of several software tasks,
+divided into $J$ classes.
+We assume that tasks of class $j$ arrive according to
+a homogeneous Poisson process with parameter $a_j$.
+Each server can process any class of task,
+but is limited to $R_i$ RAM and can process at a maximum of $P_i$ operation per unit time.
+
+Tasks in class $j$ require $r_j$ RAM and have a time to live,
+which is distributed exponentially with parameter $\tau_j$.
+Equivalently, the tasks' service rate has a Poisson distribution with parameter $\mu_j = 1/\tau_j$.
+There are $K = I \times J$ buffers for tasks of class $J$ in server $I$.
+
+The number of tasks of class $j$ waiting in the buffer on server $i$ at time $t$ is $x_{i,j}(t)$,
+with initial value $x_{i,j}(0)$.
+The cpu usage of tasks of class $j$ on server $i$ at time $t$ is $u_{i,j}(t)$.
+For each task of class $j$, $y_{i,j}(t)$ indicates whether it is running on server $i$ at time $t$.
+
+We derive the following math model for the workload placement problem:
+
+\begin{align}%
+    % looks like 3 columns but is 6 as & makes a right-aligned
+    % and left-aligned pair so we have 6 columns but only use the
+    % left, right, and left from the 3 pairs
+    && \min\limits_{u} &&& \sum\limits_i \sum\limits_j
+    \int\limits_0^T x_{i,j}(t) \mathrm{d}t \nonumber \\
+    && \mbox{s.t} &&&
+    \sum\limits_i x_{i,j}(t) = \sum\limits_i x_{i,j}(0) + a_j t -
+    \sum\limits_i {\mu_j}  \int\limits_0^t u_{i,j}(s) \textrm{d}s
+    \label{eq:workload-placement} \\
+    &&&&& \sum\limits_j y_{i,j}(t) r_j + \sum\limits_j u_{i,j}(t) r^\prime_j \leq R_i, \nonumber \\
+    &&&&& \sum\limits_j u_{i,j}(t) \leq P_i, \nonumber \\
+    &&&&& u(t), x(t) \geq 0, ~ 0 \leq t \leq T. \nonumber
+\end{align}%
+
+The model of \Cref{eq:workload-placement} is not directly computable with \gls{sclp}.
+We translate \Cref{eq:workload-placement} to the form of \Cref{eq:mcqn},
+which will enable us to use an implementation of \gls{sclp} to solve it.
+
+First,
+we compute the matrix $H$ which has dimensions $I \times K$
+and is used for the CPU and RAM constraints.
+$H$ has $I$ rows,
+one for each server,
+and has a $1$ repeated $J$ times,
+in position for that server and $0$ elsewhere.
+For example,
+the first $J$ entries of the first row have value $1$ followed by $0$'s,
+while the second row begins with $J$ $0$'s,
+followed by $J$ $1$'s,
+and continuing with $0$'s till the end.
+
+Next, we compute $F$ which has $J$ rows,
+one for each class,
+and $K-J$ columns.
+$F$ relate the buffers to the servers.
+The pattern for $F$ is to have the row $j$ of the form:
+$(0 \ldots 1 \dots 0)$,
+with the $1$ in the $j^{\text{th}}$ position repeated $I-1$ times,
+for a total of $J(I-1)=K-J$ columns.
+The reason why $F$ has only $K-J$ columns and not $K$,
+is to convert the buffer constraints to inequalities because our current implementation does not support equality constraints at this time.
+
+Next, we compute $G$,
+which represents the task flows between buffers.
+The matrix $G$ has dimension $J \times K$,
+and the entry $G_{j,k}$ has value $0$ except when $k mod J == j$.
+In this case $G_{j,k} = -\mu_x$, where $x= \lceil{k/j}\rceil$.
 
 \tbd{} Robust MCQN
 
