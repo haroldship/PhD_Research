@@ -11,7 +11,7 @@
 
 %opening
 \title{Optimal Control of Dynamic Workload Placement}
-\subtitle{PhD Research Proposal \\ under the supervision of \\ Dr Itai Dattner \\ Dr Evgeny Shindin}
+\subtitle{PhD Research Proposal \\ under the supervision of \\ Dr Itai Dattner \\ *Dr Evgeny Shindin}
 \author{Harold Ship}
 \institute{University of Haifa}
 %=============================================================================
@@ -180,20 +180,31 @@ below,
 \end{frame}
 
 %=============================================================================
-% Agenda
-%=============================================================================
-\begin{frame}{Agenda}
-    \begin{itemize}
-        \item Motivation
-    \end{itemize}
-\end{frame}
-
-%=============================================================================
 % Executive summary
 %=============================================================================
-\begin{frame}{Executive summary}
+\begin{frame}{Executive Summary}
     \begin{itemize}
-        \item Executive summary
+        \item Agenda
+        \begin{itemize}
+            \item Motivation
+            \item Background
+            \item Math Model
+            \item Statistical Model
+            \item Research Goal
+            \item Current Work
+        \end{itemize}
+
+        \item Key takeaways
+        \begin{itemize}
+            \item Research extending \acrshort{sclp}
+            \item Developing methods, algorithms and implementations
+            \item Preparing PhD research proposal
+        \end{itemize}
+
+        \item My expecations
+        \begin{itemize}
+            \item Feedback on research goal and questions
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
@@ -267,7 +278,7 @@ below,
 
 \end{frame}
 
-\begin{frame}{Background - Setup}
+\begin{frame}{Math Model}
     \begin{columns}
 
         \column{0.6\textwidth}
@@ -303,10 +314,10 @@ below,
                     \node[fill=white] at (S1.north) {Server 1};
                     \node[server,fit=(B2) (B4)] (S2) {};
                     \node[fill=white] at (S2.south) {Server 2};
-%                    \path[taskflow] (B1) edge node {$\mu_{1,3}$} (B3);
+                    \path[taskflow] (B1) edge node {$g_{1,3}$} (B3);
                     \path[taskflow,above left] (B1) edge node {$g_{1,4}$} (B4);
                     \path[taskflow, below left] (B2) edge node {$g_{2,3}$} (B3);
-%                    \path[taskflow] (B2) edge node {$\mu_{2,4}$} (B4);
+                    \path[taskflow] (B2) edge node {$g_{2,4}$} (B4);
                     \path[taskflow] (I1) edge node {$a_1$} (B1);
                     \path[taskflow] (I2) edge node {$a_2$} (B2);
                     %\path[taskflow] (B3) edge node {$\mu_3$} (O1);
@@ -324,7 +335,7 @@ below,
 \end{frame}
 
 
-\begin{frame}{Variables and Cost function}
+\begin{frame}{Model - Variables and Cost function}
         \begin{itemize}
             \item Suppose we are interested in minimizing the total waiting time
             of tasks in buffers in a time interval $[0,T]$.
@@ -344,7 +355,7 @@ below,
 \end{frame}
 
 
-\begin{frame}{CPU Constraints}
+\begin{frame}{Model - CPU Constraints}
         Remember $R_1,~R_2$ are the CPU capacities of Servers 1,2
 
         $$
@@ -360,7 +371,7 @@ below,
 \end{frame}
 
 
-\begin{frame}{CPU Constraints}
+\begin{frame}{Model - Buffer Constraints}
 
 
 $$
@@ -458,7 +469,9 @@ $$
 %=============================================================================
 % Work in progress
 %=============================================================================
-\begin{frame}{Work in progress}
+\begin{frame}{Current work}
+
+    Preparing PhD Research Proposal
 
     \begin{enumerate}
         \item Theory
