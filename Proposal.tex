@@ -350,7 +350,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
 
 
 \example{
-    \label{ex:single-computer-concrete}
+    \label{ex:one-computer-concrete}
     Suppose we have single computer that will be used to run jobs over the next 10 hours.
     It takes 1 minute to complete each job,
     so the computer can service 60 jobs per hour.
@@ -362,7 +362,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
     We can then let the computer work at $66.67\%$ for the next five hours,
     so that it processes jobs at the rate they arrive.
     In this way it will keep the queue empty.
-    \Cref{fig:single-computer-concrete} illustrates this setup.
+    \Cref{fig:one-computer-concrete} illustrates this setup.
 
     \begin{figure}
         \centering
@@ -381,7 +381,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
             \end{tikzpicture}
         }% resizebox
         \caption[Single computer with constant job rate.]{
-            \label{fig:single-computer-concrete}
+            \label{fig:one-computer-concrete}
             A single computer server with constant job arrival rate of $40$ jobs per hour.
             The computer contains a job queue $x(t)$,
             containing 100 jobs at $t=0$.
@@ -391,25 +391,25 @@ This document proposes research for a PhD in Statistics at University of Haifa i
     \end{figure}
 }
 
-
 \example{
-    \label{ex:one-computer-two-classes}
-    Our next example builds on \Cref{ex:single-computer-concrete}
+    \label{ex:one-computer-two-classes-concrete}
+    Our next example builds on \Cref{ex:one-computer-concrete}
     by adding a second job class serviced by the same computer.
-    The jobs of the two classes arrive at rates $\lambda_1, \lambda_2$,
-    where they enter queues $B_1, B_2$ with capacities $x_1(t), x_2(t)$
-    at time $t$.
-    The server can process jobs of class $j$ at rate $\mu_j$,
-    for $j=1,2$.
-    \Cref{fig:two-computer-one-input} illustrates this setup.
+    For this second class,
+    jobs arrive at $20$ per hour to a second job queue,
+    and are processed at $25$ per hour.
+    The job queue for the second job class starts with $100$ jobs in it.
+    \Cref{fig:one-computer-two-classes-concrete} illustrates this setup.
 
-    We assign a cost per unit time to each buffer $c_1, c_2$,
+    With two classes,
+    it is possible that the cost of waiting in the queue is different for each class.
+    But for now,
+    we assign a cost per unit time of $1$ to each buffer,
     and try to minimize the objective function
 
     \begin{equation}
-        \label{eq:two-computer-one-input-objective}
-        z(t) = \int\limits_0^T
-            \left( c_1 x_1(t) + c_2 x_2(t) \right) \dd{t}.
+        \label{eq:one-computer-two-classes-concrete-objective}
+        z(t) = \int\limits_0^T \left( x_1(t) + x_2(t) \right) \dd{t}.
     \end{equation}
 
     The length of the queues $B_k, k=1,2$ depends on three things:
@@ -417,40 +417,91 @@ This document proposes research for a PhD in Statistics at University of Haifa i
     jobs being processes by the server,
     and the initial quantity at time $t=0$.
     Since we now require the computer to work on two job classes,
-    we introduce the control variables $u_1(t), u_2(t)$
+    we introduce the control variables $\eta_1(t), \eta_2(t)$
     which allow us to specify how much effort to apply to each job class
     at time $t$.
     The server $S_1$ has a maximum rate it can operate,
-    which we can normalize to $1$.
-    This gives us the following constraints.
-    \Cref{eq:two-computer-one-input-server-constraints}  on the server:
-    \Cref{eq:two-computer-one-input-balancing-constraints} constrains the queue lengths $x_1(t), x_2(t)$ at time $t$.
+    which we normalize to $1$.
+    This gives us the following constraints,
+    which must hold for all $t \in [0,T]$:
+    \Cref{eq:one-computer-two-classes-concrete-server-constraints} on the server and
+    \Cref{eq:one-computer-two-classes-concrete-balancing-constraints} constrains the queue lengths $x_1(t), x_2(t)$ at time $t$.
 
     \begin{align}
-        \label{eq:two-computer-one-input-server-constraints}
+        \label{eq:one-computer-two-classes-concrete-server-constraints}
         \begin{split}
-            0 \leq u_1(t) & \leq 1 \\
-            0 \leq u_1(t) & \leq 1 \\
-            0 \leq u_1(t) + u_2(t) & \leq 1
+            0 \leq \eta_1(t) \\
+            0 \leq \eta_1(t \\
+            0 \leq \eta_1(t) + \eta_2(t) & \leq 1
         \end{split}
     \end{align}
 
     \begin{align}
-        \label{eq:two-computer-one-input-balancing-constraints}
+        \label{eq:one-computer-two-classes-concrete-balancing-constraints}
         \begin{split}
-            x_1(t) & = x_1(0) - \int\limits_0^t \mu_1 u_1(t) \dd{s} + \lambda_1 t \\
-            x_2(t) & = x_2(0) - \int\limits_0^t \mu_2 u_2(t) \dd{s} + \lambda_2 t
+            x_1(t) & = 100 - \int\limits_0^t 60 \eta_1(s) \dd{s} + 40 t \geq 0 \\
+            x_2(t) & = 100 - \int\limits_0^t 25 \eta_2(s) \dd{s} + 20 t \geq 0
         \end{split}
     \end{align}
+
+    If we define the matrices
+    $
+        G =
+        \begin{bmatrix}
+            60 & 0 \\
+            0 & 25
+        \end{bmatrix}
+    $
+    and
+    $
+        H =
+        \begin{bmatrix}
+            1 & 1
+        \end{bmatrix}
+    $,
+    and the vectors
+    $
+        c = (1,1)^\top
+    $,
+    $
+        \alpha = (100,100)^\top
+    $,
+    $
+        a = (40,20)^\top
+    $,
+    $
+        b = (1)^\top
+    $,
+    $
+        \eta(t) = (\eta_1(t), \eta_2(t))^\top
+    $,
+    and
+    $
+        x(t) = (x_1(t), x_2(t))^\top
+    $
+    we derive the following minimization problem:
+
+    \begin{align}
+        \min\limits_{u} & = \int_0^T c^\top \eta(t) \mathrm{d}t \\
+        \text{such that} & \int_0^t G \eta(s) \mathrm{d}s \leq \alpha + a t \\
+            & H \eta(t) \leq b \\
+            & \eta(t) \geq 0
+    \end{align}
+
+    This problem is formulated as an \gls{sclp} optimization problem.
+    The optimal solution is to set $\eta(t) = (1,0)$
+    on the interval $[0,5]$
+    and $(0.667, 0.333)$ on $[5,0]$.
+    We obtain an objective value of $2854.167$.
 
     \begin{figure}
         \centering
         \resizebox{\textwidth}{!}{
             \begin{tikzpicture}[node distance=1cm]
                 % buffer nodes
-                \node[buffer, font=\tiny] (B1) at (0,0) {$x_1(t)$};
+                \node[buffer, font=\tiny] (B1) at (0,0) {$x_1(0)=100$};
                 \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B1.north) {$B_1$};
-                \node[buffer, font=\tiny] (B2) [below=of B1] {$x_2(t)$};
+                \node[buffer, font=\tiny] (B2) [below=of B1] {$x_2(0)=100$};
                 \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B2.north) {$B_2$};
                 % input and output nodes
                 \node[input] (I1) [left=2.5cm of B1] {};
@@ -461,49 +512,140 @@ This document proposes research for a PhD in Statistics at University of Haifa i
                 \node[server,fit=(B1)(B2)] (S1) {};
                 \node[fill=white, font=\scriptsize] at (S1.north) {$S_1$};
                 % Network flow paths
-                \path[taskflow] (I1) edge node {$\lambda_1$} (B1);
-                \path[taskflow] (I2) edge node {$\lambda_2$} (B2);
-                \path[taskflow] (B1) edge node {$\mu_1$} (O1);
-                \path[taskflow] (B2) edge node {$\mu_2$} (O2);
+                \path[taskflow] (I1) edge node {$40$} (B1);
+                \path[taskflow] (I2) edge node {$20$} (B2);
+                \path[taskflow] (B1) edge node {$60$} (O1);
+                \path[taskflow] (B2) edge node {$25$} (O2);
             \end{tikzpicture}
         }% resizebox
         \caption[One computer with two job classes.]{
-            \label{fig:two-computer-one-input}
-            One computer with two job classes.
+            \label{fig:one-computer-two-classes-concrete}
+            One computer server with two job classes.
+            The jobs arrive at the constant rate of $40$ and $60$ jobs per hour respectively for each class.
+            Jobs from each class wait in corresponding queues
+            $x_1(t), x_2(t)$.
+            Each queue contains $100$ jobs each at $t=0$.
+            The computer services the jobs at rates
+            $60$ and $25$ jobs per hour for the two classes.
         }
     \end{figure}
 }
 
-\example{
-    \label{ex:one-computer-two-classes-concrete}
-    We continue to develop our example by fixing concrete values to the parameters of \Cref{ex:one-computer-two-classes}.
-    We set
-    $T=10$, $\lambda_1 = 40$, $\mu_1=60$, and $x_1(0) = 100$
-    like \Cref{ex:single-computer-concrete}.
-    We set the remaining parameters
-    $\lambda_2 = 20$, $\mu_2=25$, and $x_2(0) = 100$.
+\begin{example}
+    \label{ex:one-computer-two-classes-concrete-perturbed}
+    What would happen if the processing rates were $50$ and $22$
+    instead of $60$ and $25$?
+    Solving the above equations but substituting $(50,22)$ for $\eta$
+    results in the optimal solution of $\eta = (1,0)$ for the entire
+    interval $[0,10]$ and objective of $2500$.
+\end{example}
 
-    \begin{table}
-        \label{tbl:one-computer-two-classes-concrete-param-values}
-        \begin{tabular}{cc}
-            Parameter & Value \\
-            \hline
-            $T$ & 10 \\
-            $\lambda_1$ & 40 \\
-            $\lambda_2$ & 20 \\
-            $\mu_1$ & 60 \\
-            $\mu_2$ & 25 \\
-            $x_1(0)$ & 100 \\
-            $x_2(0)$ & 100
-        \end{tabular}
-        \caption[Parameter values for one computer, two job classes]
-        {Parameter values for one computer, two job classes}
-    \end{table}
-}
+%\example{
+%    \label{ex:one-computer-two-classes}
+%    Our next example builds on \Cref{ex:one-computer-concrete}
+%    by adding a second job class serviced by the same computer.
+%    We continue to develop our example by fixing concrete values to the parameters of \Cref{ex:one-computer-two-classes-concrete}.
+%
+%    The jobs of the two classes arrive at rates $\lambda_1, \lambda_2$,
+%    where they enter queues $B_1, B_2$ with capacities $x_1(t), x_2(t)$
+%    at time $t$.
+%    The server can process jobs of class $j$ at rate $\mu_j$,
+%    for $j=1,2$.
+%    \Cref{fig:two-computer-one-input} illustrates this setup.
+%
+%    We assign a cost per unit time to each buffer $c_1, c_2$,
+%    and try to minimize the objective function
+%
+%    \begin{equation}
+%        \label{eq:two-computer-one-input-objective}
+%        z(t) = \int\limits_0^T
+%            \left( c_1 x_1(t) + c_2 x_2(t) \right) \dd{t}.
+%    \end{equation}
+%
+%    The length of the queues $B_k, k=1,2$ depends on three things:
+%    jobs arriving at the queue,
+%    jobs being processes by the server,
+%    and the initial quantity at time $t=0$.
+%    Since we now require the computer to work on two job classes,
+%    we introduce the control variables $u_1(t), u_2(t)$
+%    which allow us to specify how much effort to apply to each job class
+%    at time $t$.
+%    The server $S_1$ has a maximum rate it can operate,
+%    which we can normalize to $1$.
+%    This gives us the following constraints.
+%    \Cref{eq:two-computer-one-input-server-constraints}  on the server:
+%    \Cref{eq:two-computer-one-input-balancing-constraints} constrains the queue lengths $x_1(t), x_2(t)$ at time $t$.
+%
+%    \begin{align}
+%        \label{eq:two-computer-one-input-server-constraints}
+%        \begin{split}
+%            0 \leq u_1(t) & \leq 1 \\
+%            0 \leq u_1(t) & \leq 1 \\
+%            0 \leq u_1(t) + u_2(t) & \leq 1
+%        \end{split}
+%    \end{align}
+%
+%    \begin{align}
+%        \label{eq:two-computer-one-input-balancing-constraints}
+%        \begin{split}
+%            x_1(t) & = x_1(0) - \int\limits_0^t \mu_1 u_1(t) \dd{s} + \lambda_1 t \\
+%            x_2(t) & = x_2(0) - \int\limits_0^t \mu_2 u_2(t) \dd{s} + \lambda_2 t
+%        \end{split}
+%    \end{align}
+%
+%    \begin{figure}
+%        \centering
+%        \resizebox{\textwidth}{!}{
+%            \begin{tikzpicture}[node distance=1cm]
+%                % buffer nodes
+%                \node[buffer, font=\tiny] (B1) at (0,0) {$x_1(t)$};
+%                \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B1.north) {$B_1$};
+%                \node[buffer, font=\tiny] (B2) [below=of B1] {$x_2(t)$};
+%                \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B2.north) {$B_2$};
+%                % input and output nodes
+%                \node[input] (I1) [left=2.5cm of B1] {};
+%                \node[input] (I2) [left=2.5cm of B2] {};
+%                \node[output] (O1) [right=2.5cm of B1] {};
+%                \node[output] (O2) [right=2.5cm of B2] {};
+%                % server nodes
+%                \node[server,fit=(B1)(B2)] (S1) {};
+%                \node[fill=white, font=\scriptsize] at (S1.north) {$S_1$};
+%                % Network flow paths
+%                \path[taskflow] (I1) edge node {$\lambda_1$} (B1);
+%                \path[taskflow] (I2) edge node {$\lambda_2$} (B2);
+%                \path[taskflow] (B1) edge node {$\mu_1$} (O1);
+%                \path[taskflow] (B2) edge node {$\mu_2$} (O2);
+%            \end{tikzpicture}
+%        }% resizebox
+%        \caption[One computer with two job classes.]{
+%            \label{fig:two-computer-one-input}
+%            One computer with two job classes.
+%        }
+%    \end{figure}
+%}
+
+%\begin{table}
+%    \label{tbl:one-computer-two-classes-concrete-param-values}
+%    \begin{tabular}{cc}
+%        Parameter & Value \\
+%        \hline
+%        $T$ & 10 \\
+%        $\lambda_1$ & 40 \\
+%        $\lambda_2$ & 20 \\
+%        $\mu_1$ & 60 \\
+%        $\mu_2$ & 25 \\
+%        $x_1(0)$ & 100 \\
+%        $x_2(0)$ & 100
+%    \end{tabular}
+%    \caption[Parameter values for one computer, two job classes]
+%    {Parameter values for one computer, two job classes}
+%\end{table}
+
+
 
 %\example{
 %    \label{ex:example-one-computer-two-input}
-%    Building on \Cref{ex:example-single-computer-concrete},
+%    Building on \Cref{ex:example-one-computer-concrete},
 %    we extend the model to two servers $S_1, S_2$ with buffers $B_1(t), B_2(t)$, representing one cloud and one edge computer.
 %    The tasks arrive at constant rate $\lambda_0$,
 %    but can run on either server.
@@ -651,57 +793,57 @@ This document proposes research for a PhD in Statistics at University of Haifa i
 %=============================================================================
 % Theory
 %=============================================================================
-\section{Theory}
-\label{sec:theory}
-
-\Cref{ex:one-computer-two-classes} has two classes of jobs,
-arriving at rates of $\lambda_1, \lambda_2$ respectively.
-These jobs arrive at two separate job queues,
-which we have modeled as if they were fluids flowing at constant rates.
-
-However, we notice that jobs in the real world arrive individually at discrete times.
-We usually model this type of phenomenon as a stochastic process.
-For the particular case of jobs arriving at a queue,
-we often model the arrivals as a Poisson process.
-Since we have two job classes,
-we add to our model two Poisson processes $\mathcal{P}_1,\mathcal{P}_2$,
-with parameters $\lambda_1,\lambda_2$,
-to represent the exogenous job arrival processes.
-We will approximate these processes with constant,
-continuous flows \tbd{~source~},
-which will allow us to use \gls{sclp} to find an optimal workload placement policy.
-
-For convenience,
-we number the server $i=1,\ldots,I$,
-the job classes $j=1,\ldots,J$,
-and the queues $k=1,\ldots,K$.
-From \Cref{fig:example-two-computer},
-we see that jobs can arrive at a queue from two sources:
-exogenously (from outside the system) or after processing by the server.
-We use the notation $s(j)=i$ to indicate that server $i$ processes jobs of class $j$.
-
-\tbd{~sclp model}
-
-Given an actual running system with $j=1,\ldots,J$ job classes and $k=1,\ldots,K$ queues,
-we observe two things:
-the actual job arrival times $a_j$ and,
-the queue lengths $x_k(t_n)$ at time $t_n, n=1,\ldots,N$.
-Using these,
-we can perform the optimization using different strategies such as:
-\begin{itemize}
-    \item Stochastic optimization, which optimizes the expected value of the objective function, and requires estimating the distributions of $x(t)$, $\mu$ and $a$
-    \item Robust optimization, which gives us the best value of the objective function in the worst case realizations of $x(t)$, $\mu$ and $a$,
-    but requires only their bounds.
-\end{itemize}
-
-We may or may not have historical data to provide us with initial estimates.
-
-Some questions we are considering:
-
-\begin{enumerate}
-    \item What is the best way to simultaneously optimize the workload placement and estimate the parameters, especially $\mu$?
-    \item What can we do in case the job arrival processes are not Poisson processes?
-\end{enumerate}
+%\section{Theory}
+%\label{sec:theory}
+%
+%\Cref{ex:one-computer-two-classes-concrete} has two classes of jobs,
+%arriving at rates of $\lambda_1, \lambda_2$ respectively.
+%These jobs arrive at two separate job queues,
+%which we have modeled as if they were fluids flowing at constant rates.
+%
+%However, we notice that jobs in the real world arrive individually at discrete times.
+%We usually model this type of phenomenon as a stochastic process.
+%For the particular case of jobs arriving at a queue,
+%we often model the arrivals as a Poisson process.
+%Since we have two job classes,
+%we add to our model two Poisson processes $\mathcal{P}_1,\mathcal{P}_2$,
+%with parameters $\lambda_1,\lambda_2$,
+%to represent the exogenous job arrival processes.
+%We will approximate these processes with constant,
+%continuous flows \tbd{~source~},
+%which will allow us to use \gls{sclp} to find an optimal workload placement policy.
+%
+%For convenience,
+%we number the server $i=1,\ldots,I$,
+%the job classes $j=1,\ldots,J$,
+%and the queues $k=1,\ldots,K$.
+%From \Cref{fig:example-two-computer},
+%we see that jobs can arrive at a queue from two sources:
+%exogenously (from outside the system) or after processing by the server.
+%We use the notation $s(j)=i$ to indicate that server $i$ processes jobs of class $j$.
+%
+%\tbd{~sclp model}
+%
+%Given an actual running system with $j=1,\ldots,J$ job classes and $k=1,\ldots,K$ queues,
+%we observe two things:
+%the actual job arrival times $a_j$ and,
+%the queue lengths $x_k(t_n)$ at time $t_n, n=1,\ldots,N$.
+%Using these,
+%we can perform the optimization using different strategies such as:
+%\begin{itemize}
+%    \item Stochastic optimization, which optimizes the expected value of the objective function, and requires estimating the distributions of $x(t)$, $\mu$ and $a$
+%    \item Robust optimization, which gives us the best value of the objective function in the worst case realizations of $x(t)$, $\mu$ and $a$,
+%    but requires only their bounds.
+%\end{itemize}
+%
+%We may or may not have historical data to provide us with initial estimates.
+%
+%Some questions we are considering:
+%
+%\begin{enumerate}
+%    \item What is the best way to simultaneously optimize the workload placement and estimate the parameters, especially $\mu$?
+%    \item What can we do in case the job arrival processes are not Poisson processes?
+%\end{enumerate}
 
 
 %\subsection{\acrshort{mcqn}}
