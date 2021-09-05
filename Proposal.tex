@@ -96,7 +96,9 @@
 \newcommand{\assumptionautorefname}{Assumption}
 \newtheorem{example}{Example}
 \newcommand{\exampleautorefname}{Example}
-
+\theoremstyle{plain}
+\newtheorem{claim}{Claim}
+\newcommand{\claimautorefname}{Claim}
 
 \begin{document}
 
@@ -109,9 +111,13 @@ text height=0.75cm,
 text depth=.5cm,
 text width=1cm,
 inner xsep=1em,
-inner ysep=1em,
+inner ysep=1.5em,
 text centered,
 draw=black!50
+]
+\tikzstyle{server-label}=[%
+fill=white,
+font=\scriptsize
 ]
 \tikzstyle{vserver}=[%
 rectangle,
@@ -136,9 +142,15 @@ text height=0.75cm,
 text depth=.5cm,
 text width=1cm,
 text centered,
+font=\scriptsize,
 inner sep=0pt,
-draw=red!50,
+draw=red!20,
 fill=red!20
+]
+\tikzstyle{buffer-label}=[%
+draw=red!50,
+fill=white,
+font=\tiny
 ]
 \tikzstyle{input}=[%
 rectangle,
@@ -351,7 +363,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
 
 \example{
     \label{ex:one-computer-concrete}
-    Suppose we have single computer that will be used to run jobs over the next 10 hours.
+    Suppose we have single computer that will be used to run jobs over the next 10 hours (\Cref{fig:one-computer-concrete}).
     It takes 1 minute to complete each job,
     so the computer can service 60 jobs per hour.
     Meanwhile, additional jobs arrive at a constant rate of 40 per hour.
@@ -360,21 +372,21 @@ This document proposes research for a PhD in Statistics at University of Haifa i
     If we let the computer work at $100\%$ of its capability,
     then after five hours ($100 + 40 t = 60 t \implies t = 5$) the queue will be empty.
     We can then let the computer work at $66.67\%$ for the next five hours,
-    so that it processes jobs at the rate they arrive.
+    so that it processes jobs at the rate they arrive,
+    or $40$ jobs per hour.
     In this way it will keep the queue empty.
-    \Cref{fig:one-computer-concrete} illustrates this setup.
 
     \begin{figure}
         \centering
         \resizebox{\textwidth}{!}{
             \begin{tikzpicture}[node distance=2.5cm]
                 % Server nodes
-                \node[buffer,font=\tiny] (B) at (0,0) {$x(0)=100$};
-                \node[fill=white, fill opacity=0.5, text opacity=1] at (B.north) {$B$};
+                \node[buffer] (B) at (0,0) {$x(t)$};
+                \node[buffer-label] at (B.north) {$B$};
                 \node[input] (I) [left of=B] {};
                 \node[output] (O) [right of=B] {};
                 \node[server,fit=(B)] (S) {};
-                \node[fill=white] at (S.north) {Server};
+                \node[fill=white] at (S.north) {$S_1$};
                 % Network flow paths
                 \path[taskflow] (I) edge node {$40$} (B);
                 \path[taskflow] (B) edge node {$60$} (O);
@@ -383,8 +395,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
         \caption[Single computer with constant job rate.]{
             \label{fig:one-computer-concrete}
             A single computer server with constant job arrival rate of $40$ jobs per hour.
-            The computer contains a job queue $x(t)$,
-            containing 100 jobs at $t=0$.
+            The computer contains a job queue containing $x(t)$ jobs at time $t$.
             It services the jobs at rate $60$ jobs per hour,
             after which they exit the system.
         }
@@ -397,7 +408,8 @@ This document proposes research for a PhD in Statistics at University of Haifa i
     by adding a second job class serviced by the same computer.
     For this second class,
     jobs arrive at $20$ per hour to a second job queue,
-    and are processed at $25$ per hour.
+    and it takes $2.4$ minutes to complete each job so that they
+    and are processed at $25$ jobs per hour.
     The job queue for the second job class starts with $100$ jobs in it.
     \Cref{fig:one-computer-two-classes-concrete} illustrates this setup.
 
@@ -429,11 +441,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
 
     \begin{align}
         \label{eq:one-computer-two-classes-concrete-server-constraints}
-        \begin{split}
-            0 \leq \eta_1(t) \\
-            0 \leq \eta_1(t \\
-            0 \leq \eta_1(t) + \eta_2(t) & \leq 1
-        \end{split}
+        0 \leq \eta_1(t) + \eta_2(t) & \leq 1
     \end{align}
 
     \begin{align}
@@ -479,30 +487,29 @@ This document proposes research for a PhD in Statistics at University of Haifa i
     $
         x(t) = (x_1(t), x_2(t))^\top
     $
-    we derive the following minimization problem:
+
+    we derive the following \gls{sclp} minimization problem:
 
     \begin{align}
-        \min\limits_{u} & = \int_0^T c^\top \eta(t) \mathrm{d}t \\
-        \text{such that} & \int_0^t G \eta(s) \mathrm{d}s \leq \alpha + a t \\
-            & H \eta(t) \leq b \\
-            & \eta(t) \geq 0
+    \begin{split}
+        \min\limits_{u}
+            &~ = \int_0^T c^\top \eta(t) \mathrm{d}t \\
+        \text{s.t.}
+            &~ \int_0^t G \eta(s) \mathrm{d}s \leq \alpha + a t \\
+            &~ H \eta(t) \leq b \\
+            &~ \eta(t) \geq 0
+    \end{split}
     \end{align}
-
-    This problem is formulated as an \gls{sclp} optimization problem.
-    The optimal solution is to set $\eta(t) = (1,0)$
-    on the interval $[0,5]$
-    and $(0.667, 0.333)$ on $[5,0]$.
-    We obtain an objective value of $2854.167$.
 
     \begin{figure}
         \centering
         \resizebox{\textwidth}{!}{
             \begin{tikzpicture}[node distance=1cm]
                 % buffer nodes
-                \node[buffer, font=\tiny] (B1) at (0,0) {$x_1(0)=100$};
-                \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B1.north) {$B_1$};
-                \node[buffer, font=\tiny] (B2) [below=of B1] {$x_2(0)=100$};
-                \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B2.north) {$B_2$};
+                \node[buffer] (B1) at (0,0) {$x_1(t)$};
+                \node[buffer-label] at (B1.north) {$B_1$};
+                \node[buffer] (B2) [below=of B1] {$x_2(t)$};
+                \node[buffer-label] at (B2.north) {$B_2$};
                 % input and output nodes
                 \node[input] (I1) [left=2.5cm of B1] {};
                 \node[input] (I2) [left=2.5cm of B2] {};
@@ -510,7 +517,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
                 \node[output] (O2) [right=2.5cm of B2] {};
                 % server nodes
                 \node[server,fit=(B1)(B2)] (S1) {};
-                \node[fill=white, font=\scriptsize] at (S1.north) {$S_1$};
+                \node[server-label] at (S1.north) {$S_1$};
                 % Network flow paths
                 \path[taskflow] (I1) edge node {$40$} (B1);
                 \path[taskflow] (I2) edge node {$20$} (B2);
@@ -521,528 +528,265 @@ This document proposes research for a PhD in Statistics at University of Haifa i
         \caption[One computer with two job classes.]{
             \label{fig:one-computer-two-classes-concrete}
             One computer server with two job classes.
-            The jobs arrive at the constant rate of $40$ and $60$ jobs per hour respectively for each class.
-            Jobs from each class wait in corresponding queues
-            $x_1(t), x_2(t)$.
-            Each queue contains $100$ jobs each at $t=0$.
+            The jobs arrive at the constant rates of
+            $40$ and $20$ jobs per hour respectively for each class.
+            Jobs from each class wait in corresponding queues $B_1, B_2$
+            containing $x_1(t), x_2(t)$ jobs at time $t$, respectively.
             The computer services the jobs at rates
             $60$ and $25$ jobs per hour for the two classes.
         }
     \end{figure}
 }
 
-\begin{example}
-    \label{ex:one-computer-two-classes-concrete-perturbed}
-    What would happen if the processing rates were $50$ and $22$
-    instead of $60$ and $25$?
-    Solving the above equations but substituting $(50,22)$ for $\eta$
-    results in the optimal solution of $\eta = (1,0)$ for the entire
-    interval $[0,10]$ and objective of $2500$.
-\end{example}
-
-%\example{
-%    \label{ex:one-computer-two-classes}
-%    Our next example builds on \Cref{ex:one-computer-concrete}
-%    by adding a second job class serviced by the same computer.
-%    We continue to develop our example by fixing concrete values to the parameters of \Cref{ex:one-computer-two-classes-concrete}.
-%
-%    The jobs of the two classes arrive at rates $\lambda_1, \lambda_2$,
-%    where they enter queues $B_1, B_2$ with capacities $x_1(t), x_2(t)$
-%    at time $t$.
-%    The server can process jobs of class $j$ at rate $\mu_j$,
-%    for $j=1,2$.
-%    \Cref{fig:two-computer-one-input} illustrates this setup.
-%
-%    We assign a cost per unit time to each buffer $c_1, c_2$,
-%    and try to minimize the objective function
-%
-%    \begin{equation}
-%        \label{eq:two-computer-one-input-objective}
-%        z(t) = \int\limits_0^T
-%            \left( c_1 x_1(t) + c_2 x_2(t) \right) \dd{t}.
-%    \end{equation}
-%
-%    The length of the queues $B_k, k=1,2$ depends on three things:
-%    jobs arriving at the queue,
-%    jobs being processes by the server,
-%    and the initial quantity at time $t=0$.
-%    Since we now require the computer to work on two job classes,
-%    we introduce the control variables $u_1(t), u_2(t)$
-%    which allow us to specify how much effort to apply to each job class
-%    at time $t$.
-%    The server $S_1$ has a maximum rate it can operate,
-%    which we can normalize to $1$.
-%    This gives us the following constraints.
-%    \Cref{eq:two-computer-one-input-server-constraints}  on the server:
-%    \Cref{eq:two-computer-one-input-balancing-constraints} constrains the queue lengths $x_1(t), x_2(t)$ at time $t$.
-%
-%    \begin{align}
-%        \label{eq:two-computer-one-input-server-constraints}
-%        \begin{split}
-%            0 \leq u_1(t) & \leq 1 \\
-%            0 \leq u_1(t) & \leq 1 \\
-%            0 \leq u_1(t) + u_2(t) & \leq 1
-%        \end{split}
-%    \end{align}
-%
-%    \begin{align}
-%        \label{eq:two-computer-one-input-balancing-constraints}
-%        \begin{split}
-%            x_1(t) & = x_1(0) - \int\limits_0^t \mu_1 u_1(t) \dd{s} + \lambda_1 t \\
-%            x_2(t) & = x_2(0) - \int\limits_0^t \mu_2 u_2(t) \dd{s} + \lambda_2 t
-%        \end{split}
-%    \end{align}
-%
-%    \begin{figure}
-%        \centering
-%        \resizebox{\textwidth}{!}{
-%            \begin{tikzpicture}[node distance=1cm]
-%                % buffer nodes
-%                \node[buffer, font=\tiny] (B1) at (0,0) {$x_1(t)$};
-%                \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B1.north) {$B_1$};
-%                \node[buffer, font=\tiny] (B2) [below=of B1] {$x_2(t)$};
-%                \node[fill=white, fill opacity=0.5, text opacity=1, font=\scriptsize] at (B2.north) {$B_2$};
-%                % input and output nodes
-%                \node[input] (I1) [left=2.5cm of B1] {};
-%                \node[input] (I2) [left=2.5cm of B2] {};
-%                \node[output] (O1) [right=2.5cm of B1] {};
-%                \node[output] (O2) [right=2.5cm of B2] {};
-%                % server nodes
-%                \node[server,fit=(B1)(B2)] (S1) {};
-%                \node[fill=white, font=\scriptsize] at (S1.north) {$S_1$};
-%                % Network flow paths
-%                \path[taskflow] (I1) edge node {$\lambda_1$} (B1);
-%                \path[taskflow] (I2) edge node {$\lambda_2$} (B2);
-%                \path[taskflow] (B1) edge node {$\mu_1$} (O1);
-%                \path[taskflow] (B2) edge node {$\mu_2$} (O2);
-%            \end{tikzpicture}
-%        }% resizebox
-%        \caption[One computer with two job classes.]{
-%            \label{fig:two-computer-one-input}
-%            One computer with two job classes.
-%        }
-%    \end{figure}
-%}
-
-%\begin{table}
-%    \label{tbl:one-computer-two-classes-concrete-param-values}
-%    \begin{tabular}{cc}
-%        Parameter & Value \\
-%        \hline
-%        $T$ & 10 \\
-%        $\lambda_1$ & 40 \\
-%        $\lambda_2$ & 20 \\
-%        $\mu_1$ & 60 \\
-%        $\mu_2$ & 25 \\
-%        $x_1(0)$ & 100 \\
-%        $x_2(0)$ & 100
-%    \end{tabular}
-%    \caption[Parameter values for one computer, two job classes]
-%    {Parameter values for one computer, two job classes}
-%\end{table}
-
-
-
-%\example{
-%    \label{ex:example-one-computer-two-input}
-%    Building on \Cref{ex:example-one-computer-concrete},
-%    we extend the model to two servers $S_1, S_2$ with buffers $B_1(t), B_2(t)$, representing one cloud and one edge computer.
-%    The tasks arrive at constant rate $\lambda_0$,
-%    but can run on either server.
-%    %    With no loss of generality,
-%    %    we can let $\lambda_0 = 1$.
-%    In order to model this,
-%    we introduce a ``virtual server'' $S_0$ with a buffer $B_0$.
-%    Being a mathematical abstraction only,
-%    we set the initial quantity of this buffer $x_0(0) = 0$.
-%    We will also assign a high cost to this buffer to keep it's value at $0$.
-%    Our control variables will be $u_1(t), u_2(t)$ which control how much of the input goes to each server.
-%    \Cref{fig:example-two-computer-one-input} illustrates this setup.
-%
-%    We assign a cost per unit time to each buffer $c_0, c_1, c_2$,
-%    and try to minimize the objective function
-%
-%    \begin{equation}
-%        z(t) = \int\limits_0^T
-%        \left( c_0 x_0(t) + c_1 x_1(t) + c_2 x_2(t) \right) \dd{t}
-%    \end{equation}
-%
-%    Our controls $u_1(t), u_2(t)$ ``place'' the tasks on the different computers.
-%    We accomplish this by emptying the buffer $B_0$ and filling the buffers $B_1, B_2$ which have quantities $x_0(t), x_1(t), x_2(t)$ at time $t$ respectively.
-%    The balancing equations of these buffers are:
-%
-%    \begin{align}
-%        \begin{split}
-%            x_0(t) & = \lambda_0 t - u_1(t)\lambda_0 - u_2(t)\lambda_0 \\
-%            x_1(t) & = x_1(0) + \int\limits_0^t \lambda_0 u_1(t) \dd{s} - \mu_1 t \\
-%            x_2(t) & = x_2(0) + \int\limits_0^t \lambda_0 u_2(t) \dd{s} - \mu_2 t
-%        \end{split}
-%    \end{align}
-%
-%
-%    \begin{figure}
-%        \centering
-%        \resizebox{\textwidth}{!}{
-%            \begin{tikzpicture}[node distance=1cm]
-%                % buffer nodes
-%                \node[buffer, font=\tiny] (B0) at (0,0) {$x_0(t)$};
-%                \node[fill=white, fill opacity=0.5, text opacity=1] at (B0.north) {$B_0$};
-%                \node[buffer, font=\tiny] (B1) at (3,2) {$x_1(t)$};
-%                \node[fill=white, fill opacity=0.5, text opacity=1] at (B1.north) {$B_1$};
-%                \node[buffer, font=\tiny] (B2) at (3,-2) {$x_2(t)$};
-%                \node[fill=white, fill opacity=0.5, text opacity=1] at (B2.north) {$B_2$};
-%                % input and output nodes
-%                \node[input] (I0) [left=2.5cm of B0] {};
-%                \node[output] (O1) [right=2.5cm of B1] {};
-%                \node[output] (O2) [right=2.5cm of B2] {};
-%                % server nodes
-%                \node[vserver,fit=(B0)] (S0) {};
-%                \node[fill=white] at (S0.north) {$S_0$};                \node[server,fit=(B1)] (S1) {};
-%                \node[fill=white] at (S1.north) {$S_1$};
-%                \node[server,fit=(B2)] (S2) {};
-%                \node[fill=white] at (S2.north) {$S_2$};
-%                %                % Network flow paths
-%                \path[taskflow] (I0) edge node {$\lambda_0$} (B0);
-%                \path[taskflow] (B0) edge node {$u_1(t)\lambda_0$} (B1);
-%                \path[taskflow] (B0) edge node {$u_2(t)\lambda_0$} (B2);
-%                \path[taskflow] (B1) edge node {$\mu_1$} (O1);
-%                \path[taskflow] (B2) edge node {$\mu_2$} (O2);
-%            \end{tikzpicture}
-%        }% resizebox
-%        \caption[Two computers with constant job rate.]{
-%            \label{fig:example-two-computer-one-input}
-%            A two computer network with a constant job rate.
-%        }
-%    \end{figure}
-%}
-
-%\example{
-%    \label{ex:example-two-computer}
-%    We continue extending our example.
-%
-%    We assign a cost per unit time to each buffer $c_0, \ldots, c_5$,
-%    and try to minimize the objective function
-%
-%    \begin{equation}
-%        z(t) = \int\limits_0^T \sum\limits_{j=0}^{5} c_j x_j(t) \dd{t}
-%    \end{equation}
-%
-%    \begin{align}
-%        \label{eq:example-two-computer}
-%        \begin{split}
-%            x_0(t) & = \lambda_0 t - u_{0,2}(t) - u_{0,4}(t) \\
-%            x_1(t) & = x_1(0) + \lambda_1 t - \int\limits_0^s u_{1,1}(s) \mu_1 \dd{s} \\
-%            x_2(t) & = x_2(0) + \int\limits_0^t \left( u_{0,2}(t) \lambda_0 - u_{1,2}(t) \mu_1 \right) \dd{s} \\
-%            x_3(t) & = x_3(0) + \lambda_2 t - \int\limits_0^s u_{2,1}(s) \mu_2 \dd{s} \\
-%            x_4(t) & = x_4(0) + \int\limits_0^t \left( u_{0,4}(t) \lambda_0 - u_{2,2}(t) \mu_2 \right) \dd{s}
-%        \end{split}
-%    \end{align}
-%
-%
-%    \begin{figure}
-%        \centering
-%        \resizebox{\textwidth}{!}{
-%            \begin{tikzpicture}[node distance=1cm]
-%                % buffer nodes
-%                \node[buffer, font=\tiny] (B0) at (0,0) {$x_{0}(t)$};
-%
-%                \node[buffer, font=\tiny] (B1) at (3,4) {$x_{1}(t)$};
-%                \node[buffer, font=\tiny, below=.5cm of B1] (B2) {$x_{2}(t)$};
-%
-%                \node[buffer, font=\tiny] (B3) at (3,-4) {$x_{3}(t)$};
-%                \node[buffer, font=\tiny, above=.5cm of B3] (B4) {$x_{4}(t)$};
-%
-%                % server nodes
-%                \node[vserver,fit=(B0)] (S0) {};
-%                \node[fill=white] at (S0.north) {$S_0$};
-%
-%                \node[server,fit=(B1) (B2)] (S1) {};
-%                \node[fill=white] at (S1.north) {$S_1$};
-%
-%                \node[server,fit=(B3) (B4)] (S2) {};
-%                \node[fill=white] at (S2.north) {$S_2$};
-%
-%                % input and output nodes
-%                \node[input, left=2cm of B0] (I0) {};
-%                \node[input, left=6cm of B1] (I1) {};
-%                \node[input, left=6cm of B3] (I2) {};
-%                \node[output, right=2cm of B1] (O1) {};
-%                \node[output, right=2cm of B2] (O2) {};
-%                \node[output, right=2cm of B3] (O3) {};
-%                \node[output, right=2cm of B4] (O4) {};
-%
-%                %                % Network flow paths
-%                \path[taskflow] (I0) edge node {$\lambda_0$} (B0);
-%                \path[taskflow] (I1) edge node {$\lambda_1$} (B1);
-%                \path[taskflow] (I2) edge node {$\lambda_2$} (B3);
-%                \path[taskflow] (B0) edge node {$u_{0,2}(t) \lambda_0 $} (B2);
-%                \path[taskflow] (B0) edge node {$u_{0,4}(t) \lambda_0 $} (B4);
-%                \path[taskflow] (B1) edge node {$u_{1,1}(t) \mu_1$} (O1);
-%                \path[taskflow] (B2) edge node {$u_{1,2}(t) \mu_1$} (O2);
-%                \path[taskflow] (B3) edge node {$u_{2,1}(t) \mu_2$} (O3);
-%                \path[taskflow] (B4) edge node {$u_{2,2}(t) \mu_2$} (O4);
-%            \end{tikzpicture}
-%        }% resizebox
-%        \caption[Two computers with three inputs.]{
-%            \label{fig:example-two-computer}
-%            A two computer network with three job classes with constant job rates.
-%        }
-%    \end{figure}
-%}
-
-%=============================================================================
+% =============================================================================
 % Theory
-%=============================================================================
-%\section{Theory}
-%\label{sec:theory}
-%
-%\Cref{ex:one-computer-two-classes-concrete} has two classes of jobs,
-%arriving at rates of $\lambda_1, \lambda_2$ respectively.
-%These jobs arrive at two separate job queues,
-%which we have modeled as if they were fluids flowing at constant rates.
-%
-%However, we notice that jobs in the real world arrive individually at discrete times.
-%We usually model this type of phenomenon as a stochastic process.
-%For the particular case of jobs arriving at a queue,
-%we often model the arrivals as a Poisson process.
-%Since we have two job classes,
-%we add to our model two Poisson processes $\mathcal{P}_1,\mathcal{P}_2$,
-%with parameters $\lambda_1,\lambda_2$,
-%to represent the exogenous job arrival processes.
-%We will approximate these processes with constant,
-%continuous flows \tbd{~source~},
-%which will allow us to use \gls{sclp} to find an optimal workload placement policy.
-%
-%For convenience,
-%we number the server $i=1,\ldots,I$,
-%the job classes $j=1,\ldots,J$,
-%and the queues $k=1,\ldots,K$.
-%From \Cref{fig:example-two-computer},
-%we see that jobs can arrive at a queue from two sources:
-%exogenously (from outside the system) or after processing by the server.
-%We use the notation $s(j)=i$ to indicate that server $i$ processes jobs of class $j$.
-%
-%\tbd{~sclp model}
-%
-%Given an actual running system with $j=1,\ldots,J$ job classes and $k=1,\ldots,K$ queues,
-%we observe two things:
-%the actual job arrival times $a_j$ and,
-%the queue lengths $x_k(t_n)$ at time $t_n, n=1,\ldots,N$.
-%Using these,
-%we can perform the optimization using different strategies such as:
-%\begin{itemize}
-%    \item Stochastic optimization, which optimizes the expected value of the objective function, and requires estimating the distributions of $x(t)$, $\mu$ and $a$
-%    \item Robust optimization, which gives us the best value of the objective function in the worst case realizations of $x(t)$, $\mu$ and $a$,
-%    but requires only their bounds.
-%\end{itemize}
-%
-%We may or may not have historical data to provide us with initial estimates.
-%
-%Some questions we are considering:
-%
-%\begin{enumerate}
-%    \item What is the best way to simultaneously optimize the workload placement and estimate the parameters, especially $\mu$?
-%    \item What can we do in case the job arrival processes are not Poisson processes?
-%\end{enumerate}
+% =============================================================================
+\section{Theory}
+\label{sec:theory}
+
+% =============================================================================
+% Stochastic Processes
+% =============================================================================
+\subsection{Stochastic Processes}
+\label{subsec:theory:stochastic_processes}
+
+Ornstein–Uhlenbeck process
 
 
-%\subsection{\acrshort{mcqn}}
-%\label{subsec:theory:mcqn}
-%
-%Let $\qnet$ be a queueing network containing $i = 1, \ldots, I$
-%servers operating over a finite time interval $[0,T]$.
-%The servers process fluid which is divided into classes $j = 1, \ldots, J$,
-%and fluid from class $j$ processed by one server $s(j) = i$.
-%Fluid waits for processing in buffers $k = 1, \ldots, K$,
-%and,
-%once processed,
-%flows from buffer $f(j) = k$.
-%An conceptual example of fluid or task flows can be seen in \Cref{fig:task-flows}.
-%Tasks entering $\qnet$ from the outside are called exogenous,
-%and tasks of class $j$ arrive at one of the servers with a rate $a_j$.
-%We use this constant rate to approximate the Poisson arrival process
-%with parameter $a_j$.
-%
-%For fluid of class $j$,
-%we apply a control to server $s(j)$ at time $t$
-%to process fluid at rate $u_j(t)$ per unit time,
-%giving us a vector of control variables $u(t) \in \RR{J}$.
-%Also at time $t$,
-%the amount of fluid awaiting processing in the $k$ buffers is $x_(t)$.
-%
-%The specification of the basic \gls{mcqn} problem is:
-%\begin{align} \label{eq:mcqn}%
-%    % looks like 3 columns but is 6 as & makes a right-aligned
-%    % and left-aligned pair so we have 6 columns but only use the
-%    % left, right, and left from the 3 pairs
-%    && \max\limits_{u(t), x(t)} &&& \int\limits_0^T(\gamma^\top +
-%      (T-t)c^\top)u(t)+d^\top x(t)\mathrm{d}t \nonumber \\
-%    & \mbox{MCQN} & \mbox{s.t} &&& \int\limits_0^T G u(s)\mathrm{d}s +
-%      F x(t) = \alpha+at, \\
-%%      x(t)   \leq \alpha+at, \\
-%    &&&&& H u(t) \leq b, \nonumber \\
-%    &&&&& x(t), u(t) \geq 0, ~ 0 \leq t \leq T, \nonumber
-%\end{align}
-%
-%
-%$\gamma \in \RR{J}$ is processing cost per job class,
-%$c$ is \tbd.
-%$d \in \RR{K}$ is the holding cost per buffer,
-%$\alpha \in \RR{K}$ is the initial amount of fluid in the buffers
-%$b \in \RR{I}$ is the maximum processing rate of the $J$ servers.
-%Additionally,
-%we have the matrices $G \in \RR{J \times K}$ and $H \in \RR{I \times J}$.
-%$G$ describes the inflows $(1)$ and outflows ($p_{j,k}$).
-%$F$ describes which buffers belong to which server,
-%while $H$ describes the service times $\tau_j$ for each job class,
-%the reciprocals of the maximum service rates $\mu_j$.
-%
-%\begin{align}
-%    G = G_{j,k} = &
-%    \begin{cases}
-%        1 & f(j) = k \\
-%        -p_{j,k} & f(j) \neq k
-%    \end{cases} \\
-%    H = H_{i,j} = &
-%\begin{cases}
-%    1/\mu_j & s(j) = i \\
-%    0 & s(j) \neq i
-%\end{cases}
-%\end{align}
-%
-%\begin{figure}
-%    \centering
-%    \begin{tikzpicture}
-%        \node[task] (T1) at (0,0) {$T_1$};
-%        \node[task] (T2) [below left=of T1] {$T_2$};
-%        \node[task] (T3) [below right=of T1] {$T_3$};
-%        \node[task] (T4) [below=of T3] {$T_4$};
-%        \node[task] (T5) [below left=of T4] {$T_5$};
-%        \path[taskflow] (T1) edge node {} (T2);
-%        \path[taskflow] (T2) edge node {} (T5);
-%        \path[taskflow] (T1) edge node {} (T3);
-%        \path[taskflow] (T3) edge node {} (T4.north);
-%        \path[taskflow] (T4.south) edge node {} (T5.north);
-%    \end{tikzpicture}
-%    \caption[Example fluid or task flows.]{
-%        \label{fig:task-flows}
-%        Example fluid or task flows.
-%        A flow is the set of arrows coming out of a task node.
-%        Task $T_1$ flows to $T_2$ and $T_3$.
-%        Task $T_2$ flows straight to $T_5$.
-%        Task $T_3$ flows to $T_4$,
-%        which then flows to $T_5$ as well.
-%    }
-%\end{figure}
-%
+% =============================================================================
+% Preliminary Results
+% =============================================================================
+\section{Preliminary Results}
+\label{sec:results}
 
-%=============================================================================
-% Workload Placement Example
-%=============================================================================
-%\subsection{Workload Placement Example}
-%\label{subseq:theory:workload-placement}
-%
-%Suppose we have a computerized workload that we would like to run on a set of $I$ networked servers.
-%The workload we wish to run is made up of several software tasks,
-%divided into $J$ classes.
-%We assume that tasks of class $j$ arrive according to
-%a homogeneous Poisson process with parameter $a_j$.
-%Each server can process any class of task,
-%but is limited to $R_i$ RAM and can process at a maximum of $P_i$ operation per unit time.
-%
-%Tasks in class $j$ require $r_j$ RAM and have a time to live,
-%which is distributed exponentially with parameter $\tau_j$.
-%Equivalently, the tasks' service rate has a Poisson distribution with parameter $\mu_j = 1/\tau_j$.
-%There are $K = I \times J$ buffers for tasks of class $J$ in server $I$.
-%
-%The number of tasks of class $j$ waiting in the buffer on server $i$ at time $t$ is $x_{i,j}(t)$,
-%with initial value $x_{i,j}(0)$.
-%The cpu usage of tasks of class $j$ on server $i$ at time $t$ is $u_{i,j}(t)$.
-%For each task of class $j$, $y_{i,j}(t)$ indicates whether it is running on server $i$ at time $t$.
-%
-%We derive the following math model for the workload placement problem:
-%
-%\begin{align}%
-%     looks like 3 columns but is 6 as & makes a right-aligned
-%     and left-aligned pair so we have 6 columns but only use the
-%     left, right, and left from the 3 pairs
-%    && \min\limits_{u} &&& \sum\limits_i \sum\limits_j
-%    \int\limits_0^T x_{i,j}(t) \mathrm{d}t \nonumber \\
-%    && \mbox{s.t} &&&
-%    \sum\limits_i x_{i,j}(t) = \sum\limits_i x_{i,j}(0) + a_j t -
-%    \sum\limits_i {\mu_j}  \int\limits_0^t u_{i,j}(s) \textrm{d}s
-%    \label{eq:workload-placement} \\
-%    &&&&& \sum\limits_j y_{i,j}(t) r_j + \sum\limits_j u_{i,j}(t) r^\prime_j \leq R_i, \nonumber \\
-%    &&&&& \sum\limits_j u_{i,j}(t) \leq P_i, \nonumber \\
-%    &&&&& u(t), x(t) \geq 0, ~ 0 \leq t \leq T. \nonumber
-%\end{align}%
-%
-%The model of \Cref{eq:workload-placement} is not directly computable with \gls{sclp}.
-%We translate \Cref{eq:workload-placement} to the form of \Cref{eq:mcqn},
-%which will enable us to use an implementation of \gls{sclp} to solve it.
-%
-%First,
-%we compute the matrix $H$ which has dimensions $I \times K$
-%and is used for the CPU and RAM constraints.
-%$H$ has $I$ rows,
-%one for each server,
-%and has a $1$ repeated $J$ times,
-%in position for that server and $0$ elsewhere.
-%For example,
-%the first $J$ entries of the first row have value $1$ followed by $0$'s,
-%while the second row begins with $J$ $0$'s,
-%followed by $J$ $1$'s,
-%and continuing with $0$'s till the end.
-%
-%Next, we compute $F$ which has $J$ rows,
-%one for each class,
-%and $K-J$ columns.
-%$F$ relate the buffers to the servers.
-%The pattern for $F$ is to have the row $j$ of the form:
-%$(0 \ldots 1 \dots 0)$,
-%with the $1$ in the $j^{\text{th}}$ position repeated $I-1$ times,
-%for a total of $J(I-1)=K-J$ columns.
-%The reason why $F$ has only $K-J$ columns and not $K$,
-%is to convert the buffer constraints to inequalities because our current implementation does not support equality constraints at this time.
-%
-%Next, we compute $G$,
-%which represents the task flows between buffers.
-%The matrix $G$ has dimension $J \times K$,
-%and the entry $G_{j,k}$ has value $0$ except when $k mod J == j$.
-%In this case $G_{j,k} = -\mu_x$, where $x= \lceil{k/j}\rceil$.
-%
-%\tbd{} Robust MCQN
-%
-%\tbd{} Re-entrant
-%
-%\tbd{} Robust re-entrant
+We performed further analysis of \Cref{ex:one-computer-two-classes-concrete}.
 
-%=============================================================================
-% Questions
-%=============================================================================
-%\section{Questions}
-%\label{sec:questions}
-%
-%We would like to known the bounds of the arrival and service rates.
-%If there is historical data,
-%what is the state of the art on these estimates?
-%
-%\begin{enumerate}
-%    \item How can we estimate the parameters and the uncertainty set with and
-%    without historical data?
-%    How can we compute the robust counterpart of \gls{sclp} from this?
-%    How can we create a policy for parameter estimation that doesn't lose too
-%    much in terms of the objective?
-%    It may be possible to estimate the data by running a system which is far
-%    from optimal.
-%    In many cases this could be expensive.
-%    \item Can we develop a system and method to generate policies from online
-%    networks that can detect changes in the data and self-adjust?
-%    \item Can we extend \gls{sclp} to piecewise constant parameters,
-%    in particular the task arrival rates?
-%    \item What other ways can we extend the arrival process?
-%    \item How can we estimate the uncertainty set for the robust problem?
-%\end{enumerate}
+\newcommand{\modelone}{Model 1}
+\newcommand{\modeltwo}{Model 2}
+
+First we solve the deterministic model,
+which we call \modelone:
+
+\begin{align}
+\label{eq:model-1}
+\begin{split}
+    \min\limits_{\eta_1, \eta_2}
+        &~ \int_0^T \left( x_1(t) + x_2(t) \right) \dd t \\
+    \text{s.t.}
+        &~ 0 \leq \eta_1(t) + \eta_2(t) \leq 1 \\
+        &~ x_1(t) = 100 - \int_0^t 60 \eta_1(s) \dd s + 40t \geq 0 \\
+        &~ x_2(t) = 100 - \int_0^t 25 \eta_2(s) \dd s + 25t \geq 0
+\end{split}
+\end{align}
+
+The optimal solution,
+obtained using the SCLP-Python solver \autocite{Shindin_SCLPPython_2021},
+has the server applying $100\%$ effort on class 1 jobs for the first $5$ hours,
+then $66.67\%$ on class 1 and 33.33\% on class 2 for the last 5 seconds.
+The value of the objective is $2145.83$.
+
+We define a second model,
+based on the model of \autocite{bertsimas2014robust}.
+Define  decision variables $u_1(t), u_2(t)$ as the task flow rates
+in tasks per unit time.
+The server effort is still constrained at $100\%$,
+and so we translate the constraints according to the formulas:
+\begin{align}
+\label{eq:model-2-translation}
+\begin{split}
+    u_1(t) & = 60 \eta_1(t) ~ \text{and} \\
+    u_2(t) & = 25 \eta_2(t).
+\end{split}
+\end{align}
+
+We derive the following optimization model,
+which we call \modeltwo:
+
+\begin{align}
+\label{eq:model-2}
+\begin{split}
+    \min\limits_{u_1, u_2}
+        &~ \int_0^T \left( x_1(t) + x_2(t) \right) \dd t \\
+    \text{s.t.}
+        &~ 0 \leq \frac{u_1(t)}{60} + \frac{u_2(t)}{25} \leq 1 \\
+        &~ x_1(t) = 100 - \int_0^t u_1(s) \dd s + 40t \geq 0 \\
+        &~ x_2(t) = 100 - \int_0^t u_2(s) \dd s + 25t \geq 0
+\end{split}
+\end{align}
+
+This optimal solution for \modeltwo is to process $60$ jobs per hour of class 1
+for the first 5 hours,
+then $40$ jobs per hour of class 1 and $8.33$ of class 2 for the rest.
+This is equivalent to \modelone,
+under the transformation of \Cref{eq:model-2-translation},
+and the objective function has the same value of $2145.83$.
+
+We have assumed that jobs of class $j$ are completed at rate of $\mu_j$ jobs per hour,
+where $\mu_1=60$ and $\mu_2=25$.
+This is equivalent to each job of class $j$ taking $\tau_j=1/\mu_j$ hours,
+so $\tau_1=0.0167$ and $\tau_2 = 0.04$
+Suppose that jobs of class $j$ are not all competed in exactly $\tau_j$ hours,
+for class $j=1,2$.
+For example,
+suppose we know that for $\epsilon > 0$
+we have the time taken for jobs in class $j$ run is between
+$\tau_j (1 - 0.5 \epsilon)$
+and
+$\tau_j (1 + 0.5 \epsilon)$
+hours.
+In other words,
+we don't know the exact amount of time each job requires,
+but we do have lower and upper bounds for it.
+We call this \textit{box uncertainty}.
+By using \modeltwo,
+we can follow the methodology of Bertsimas and build a Robust version.
+
+We ``assume the worst'' and solve the system as though each job takes the maximum amount of time,
+$\tau_j (1+ 0.5 \epsilon)$.
+Using for example,
+$\epsilon=0.1$,
+we adjust and solve \modeltwo:
+
+\begin{align}
+    \label{eq:model-2-robust}
+    \begin{split}
+        \min\limits_{u_1, u_2}
+        &~ \int_0^T \left( x_1(t) + x_2(t) \right) \dd t \\
+        \text{s.t.}
+        &~ 0 \leq \frac{u_1(t)}{54.55} + \frac{u_2(t)}{22.73} \leq 1 \\
+        &~ x_1(t) = 100 - \int_0^t u_1(s) \dd s + 40t \geq 0 \\
+        &~ x_2(t) = 100 - \int_0^t u_2(s) \dd s + 25t \geq 0
+    \end{split}
+\end{align}
+
+This gives us a solution where our server processes $54.55$
+jobs of class 1 for the first $6.875$ hours,
+and $40$ class 1 plus $6.06$ class 2 jobs for the remaining $3.125$ hours.
+However,
+we cannot apply this solution directly to our server,
+because a server generally allows us to control server effort,
+not job throughput.
+We must be careful when we do this,
+because should the processing rate turn out to be higher than the worst case,
+our job queue may be empty when we have scheduled server effort for that class.
+To compensate,
+we the following adjustment to \Cref{eq:model-2-translation} for $\epsilon=0.1$:
+\begin{align}
+    \label{eq:model-2-translation-robust}
+    \begin{split}
+        \eta_1(t) & = 60(0.95) u_1(t) ~ \text{and} \\
+        \eta_2(t) & = 25(0.95) u_2(t).
+    \end{split}
+\end{align}
+
+We would like to know how this Robust Model would perform in an actual realization.
+In order to answer this question,
+we will create a simulated realization of the task processing times.
+Define
+$\bar{\tau_j}(t) = \tau_j (1 + 0.5\zeta(t) \epsilon)$
+for $t \in [0,T]$,
+where $\zeta(t):[0,T] \to [0,1]$ is a stochastic process.
+
+We will compute a realization of $\zeta(t)$,
+and use it to simulate a realization of $\bar{\tau_j}(t)$.
+We will then use the realization of $\bar{\tau_j}(t)$ to compute the buffer quantity:
+
+\begin{align}
+\label{eq:buffer-robust-realization}
+\begin{split}
+    x_1^R (t) &= 100 + 40 t \int_0^t \frac{\eta_1(s)}{\tau_1(s)} \dd s \\
+    x_2^R (t) &= 100 + 20 t \int_0^t \frac{\eta_2(s)}{\tau_2(s)} \dd s
+\end{split}
+\end{align}
+
+The value of our objective is then:
+\begin{equation}
+    \label{eq:cost-robust-realization}
+    \int_0^T \left( x_1^R(t) + x_2^R(t) \right) \dd t
+\end{equation}
+which in our realization is $2614.53$.
+
+What if,
+instead of solving \modeltwo which is Bertsimas' model,
+we solve our original model,
+\modelone?
+
+Define,
+for classes $j=1,2$,
+$\mu_j=1/(\tau_j ( 1 - 0.5 \epsilon))$.
+This assumes we process jobs as fast as possible.
+But we must make sure we do not cause the queues to become empty.
+Adjust \modelone as follows:
+\begin{align}
+    \label{eq:model-1-robust}
+    \begin{split}
+        \min\limits_{\eta_1, \eta_2}
+        &~ \int_0^T \left( x_1(t) + x_2(t) \right) \dd t \\
+        \text{s.t.}
+        &~ 0 \leq \eta_1(t) + \eta_2(t) \leq 1 \\
+        &~ x_1(t) = 100 - \int_0^t 63.16 \eta_1(s) \dd s + 40t \geq 0 \\
+        &~ x_2(t) = 100 - \int_0^t 26.32 \eta_2(s) \dd s + 25t \geq 0
+    \end{split}
+\end{align}
+
+We obtain the solution of $100\%$ server effort on class 1 for $3.75$ hours,
+then $60\%$ on class 1 and $40\%$ on class 2 for the remaining $6.25$ hours.
+We compute the buffer values using \Cref{eq:buffer-robust-realization} once again,
+and the objective using \Cref{eq:cost-robust-realization},
+this time obtaining a value of $2573.25$ for the same realization.
+
+\begin{claim}
+    The for any realization $\tau^*(t)$ of $\bar{\tau}(t)$,
+    define $Z_1$ as the objective from Robust \modelone,
+    and $Z_2$ as the objective from Robust \modeltwo.
+    Then $Z_1(\tau^*(t)) < Z_2(\tau^*(t))$.
+\end{claim}
+
+We now suggest an alternative method of obtaining an optimal solution.
+Recall that the constraints in \Cref{ex:one-computer-two-classes-concrete}
+are of two kinds:
+server effort constraints,
+and buffer constraints.
+Our suggested method will solve the nominal case,
+which is the same as what we previously called the deterministic case,
+to obtain some rules for the optimal control of the server.
+However,
+we will apply some post-processing logic to the realization,
+where we allow the buffer value \textit{of the realization}
+to go below $0$.
+When it does,
+the server will apply $0$-effort to the corresponding job class.
+
+We define the following:
+
+\begin{align}
+\begin{split}
+    \xi_1(t) & = 100 - \int_0^s 60 \eta_1(s) \dd s  + 40t \\
+    \xi_2(t) & = 100 - \int_0^s 25 \eta_2(s) \dd s  + 20t
+\end{split}
+\end{align}
+
+Then we define, for $j=1,2$
+\begin{equation}
+    x_j^R(t) =
+    \begin{cases}
+        \xi_j(t) & \xi_j(t) > 0 \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation}.
+
+Using the same realization as above,
+we obtain the objective $2181.73$,
+which is not far off the deterministic value.
+
+\begin{claim}
+    Define $Z^*$ as the objective obtained in our new proposed method,
+    and $Z$ as the objective of the deterministic model.
+    Then,
+    for certain stochastic processes $\zeta(t)$,
+    we have $\mathbb{E}(Z^*) \to Z$.
+\end{claim}
+
 
 \clearpage
 \printbibliography
