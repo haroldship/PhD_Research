@@ -31,7 +31,8 @@
 \usepackage{mathtools} % loads amsmath plus other tools
 \usepackage{fixmath} % fix greek letters
 \usepackage{relsize} % for \mathlarger
-\usepackage{bm}
+\usepackage{bm} % for \bm which does bold in math mode
+\usepackage[noend]{algpseudocode} % for algorithmics
 
 % math theorems and theorem environments
 \usepackage{amsthm}
@@ -386,7 +387,7 @@ This document proposes research for a PhD in Statistics at University of Haifa i
                 \node[input] (I) [left of=B] {};
                 \node[output] (O) [right of=B] {};
                 \node[server,fit=(B)] (S) {};
-                \node[fill=white] at (S.north) {$S_1$};
+                \node[fill=white] at (S.north) {$S$};
                 % Network flow paths
                 \path[taskflow] (I) edge node {$40$} (B);
                 \path[taskflow] (B) edge node {$60$} (O);
@@ -394,8 +395,8 @@ This document proposes research for a PhD in Statistics at University of Haifa i
         }% resizebox
         \caption[Single computer with constant job rate.]{
             \label{fig:one-computer-concrete}
-            A single computer server with constant job arrival rate of $40$ jobs per hour.
-            The computer contains a job queue containing $x(t)$ jobs at time $t$.
+            A single computer server $S$ with constant job arrival rate of $40$ jobs per hour.
+            The computer contains a job queue $B$ containing $x(t)$ jobs at time $t$.
             It services the jobs at rate $60$ jobs per hour,
             after which they exit the system.
         }
@@ -545,12 +546,255 @@ This document proposes research for a PhD in Statistics at University of Haifa i
 \label{sec:theory}
 
 % =============================================================================
-% Stochastic Processes
+% The Workload Placement Problem
 % =============================================================================
-\subsection{Stochastic Processes}
-\label{subsec:theory:stochastic_processes}
+\subsection{The Workload Placement Problem}
+\label{subsec:theory:workload-placement}
 
-Ornstein–Uhlenbeck process
+% =============================================================================
+% Multi-class Queueing Networks
+% =============================================================================
+\subsection{Multi-class Queueing Networks}
+\label{subsec:theory:mcqn}
+
+We would like to model the Workload Placement problem as a \gls{mcqn}.
+Then,
+following \autocite{weiss1999scheduling},
+we approximate the discrete \gls{mcqn} with a continuous fluid processing network.
+
+``The finite horizon system can be approximated by a multiclass fluid network. We discuss a conjecture that the fluid control problem is a relaxation of the manufacturing system problem under on-line control policies, and hence it provides a bound on the optimal objective.''
+
+``The fluid solution can also be used to provide a detailed heuristic schedule for the manufacturing system which emulates the fluid solution.''
+
+
+% =============================================================================
+% State of the Art
+% =============================================================================
+\subsection{State of the Art}
+\label{subsec:theory:state_of_the_art}
+
+A review of \autocite{bertsimas2014robust}.
+
+A \gls{mcqn} is a system for processing jobs,
+which are divided into classes.
+Each job in a class has the same arrival rate,
+processing time,
+a cost per unit time for holding it in its queue and for processing it,
+and a defined path through the network.
+In order to find the optimal job to process at each server,
+one must know the current state of all the queues on that server,
+and also the states of other servers that feed into and out of the server.
+These problems quickly become large and difficult to solve.
+
+Most often,
+the processing times and arrival rates are known with some degree of uncertainty.
+This adds further complexity to the problem.
+\autocite{bertsimas2014robust} lists several attempts to solve \gls{mcqn} with uncertain parameters.
+The problem can be formulated as a ``stochastic dynamic programming'' problem.
+However,
+this method is intractable for large problems.
+
+
+\begin{itemize}
+    \item stochastic dynamic programming,
+    but problems quickly become intractable,
+    \item Brownian approximation models and
+    \item fluid approximations
+\end{itemize}
+
+The realized arrival rates and service times for class $i$ are
+defined as $\lambda_i(t), \tau_i(t)$ respectively.
+For $t in [0,T]$,
+$\tau_i(t) \in [\bar{\tau}_i, \tilde{\tau}_i]$ and
+$\lambda_i(t) \in [\bar{\lambda}_i, \tilde{\lambda}_i]$.
+Call $\bar{\tau}_i$ and $\bar{\lambda}_i$ the nominal arrival rate and service time.
+Call $\tilde{\tau}_i$ and $\tilde{\lambda}_i$ the deviation arrival rate and service time,
+and $z_i(t)$, $\zeta_i(t)$ the relative deviations.
+$z_i(t)$ is defined as
+
+\begin{equation}
+    z_i(t) =
+    \begin{cases}
+        \frac{\tau_i(t) - \bar{\tau}_i}{\tilde{\tau}_i} & \tilde{\tau}_i > 0 \\
+        0 & \text{otherwise.}
+    \end{cases}
+\end{equation}
+$\zeta_i(t)$ is defined analogously for $\lambda$.
+
+
+The Robust Counterpart requires additional sets of decision variables
+$\alpha, \beta$,
+and is formulated in \Cref{eq:mcqn-robust-counterpart}.
+
+\begin{align}
+\begin{split}
+    \label{eq:mcqn-robust-counterpart}
+    \min & \int_{0}^{T} \mathbf{c}^{\prime} \mathbf{x}(t) d t \\
+    \text { s.t. } & \int_{0}^{t} \mathbf{A} \mathbf{u}(s) d s+\mathbf{x}(t)=\mathbf{x}(0)+\overline{\boldsymbol{\lambda}} t, \quad \forall t \\
+    & \Gamma_{j} \beta_{j}(t)+\sum_{i: s(i)=j}\left(\bar{\tau}_{i} u_{i}(t)+\alpha_{i}(t)\right) \leq 1, \quad \forall j, t, \\
+    & \alpha_{i}(t)+\beta_{j}(t)-u_{i}(t) \tilde{\tau}_{i} \geq 0, \forall j, i \text { with } s(i)=j, \quad \forall t \\
+    & \mathbf{u}(t), \mathbf{x}(t), \boldsymbol{\alpha}(t), \boldsymbol{\beta}(t) \geq \mathbf{0}, \quad \forall t
+\end{split}
+\end{align}
+
+
+% =============================================================================
+% Proposed Research Topics
+% =============================================================================
+\section{Proposed Research Topics}
+\label{sec:topics}
+
+In this section,
+we discuss proposed topics for research.
+The context is a \gls{mcqn}.
+We assume that the arrival rates $\lambda$
+and the processing rates $\mu$ of the job classes are unknown,
+although we may have initial estimates for these.
+We will observe a system over a specified time period which we call $t \in [0,T]$.
+We take samples at predetermined,
+fixed time intervals $m=1,\ldots,M$,
+of $\lambda(t_n)$,
+the observed number of arrivals by time $t_n$,
+and $\mu(t_n)$,
+the observed number of processed jobs by $t_n$.
+For example,
+when $N=1$,
+we can estimate the mean arrival and processing rates.
+
+\subsection{Extension of the SCLP Simplex Algorithm to Budgeted Robust Optimization of MCQN}
+\label{subsec:topics:robust-sclp-extension}
+
+The Robust Optimization strategy consists of defining the set of allowable
+values for the optimization parameters,
+called the uncertainty set.
+Next,
+we assign a nominal value to each of the parameters from within the uncertainty set.
+We then derive a new optimization problem,
+based on the original,
+called the Robust Counterpart.
+We then find the optimal value for the robust counterpart,
+called the Robust Optimal Solution.
+
+\Autocite{bertsimas2014robust} develop such a model for \gls{mcqn},
+based on the fluid approximation.
+
+Because the solution is large,
+they solve it by discretizing the time interval,
+and solving it as an LP problem.
+There are several disadvantages to this approach.
+There is a trade-off between optimality of the solution and computation time,
+controlled by the fineness of the discretization,
+which may not have a satisfactory choice.
+It is difficult to adapt the solution to changes in the optimization problem.
+
+Our proposal is to use the SCLP Simplex algorithm \autocite{weiss2008simplex,shindin2021application},
+adapting it for the Robust Optimization with uncertainty budget constraints.
+The main problem with the current algorithm is that the budgeted constraints result in a
+degenerate SCLP problem.
+The Simplex-type algorithm is designed to handle degeneracy.
+Our research will focus on developing an algorithm,
+based on Simplex SCLP,
+that can solve degenerate problems.
+
+\begin{align}
+    \min & \int_{0}^{T} \mathbf{c}^{\prime} \mathbf{x}(t) d t \\
+    \text { s.t. } & \int_{0}^{t} \mathbf{A} \mathbf{u}(s) d s+\mathbf{x}(t)=\mathbf{x}(0)+\overline{\boldsymbol{\lambda}} t, \quad \forall t \\
+    & \Gamma_{j} \beta_{j}(t)+\sum_{i: s(i)=j}\left(\bar{\tau}_{i} u_{i}(t)+\alpha_{i}(t)\right) \leq 1, \quad \forall j, t, \\
+    & \alpha_{i}(t)+\beta_{j}(t)-u_{i}(t) \tilde{\tau}_{i} \geq 0, \forall j, i \text { with } s(i)=j, \quad \forall t \label{eq:robust-sclp-mcqn-budgeted} \\
+    & \mathbf{u}(t), \mathbf{x}(t), \boldsymbol{\alpha}(t), \boldsymbol{\beta}(t) \geq \mathbf{0}, \quad \forall t
+\end{align}
+
+\Cref{eq:robust-sclp-mcqn-budgeted} has right-hand-side allowing $0$.
+This means the SCLP problem is degenerate and hence optimal solution with zero-valued
+decision variables.
+
+In LP,
+the standard way to handle degeneracy is to perturb the right-hand-side
+of the constraints with small values.
+In SCLP,
+this may produce intervals that are too short to use.
+To avoid this issue,
+we plan to develop another strategy to resolve the degeneracy in SCLP.
+One possibility is based on \gls{mwua},
+which was has been used to solve Linear Programming and Graph Flow optimization problems \autocite{arora2012multiplicative}.
+
+\subsection{Enhanced, Relaxed Robust SCLP for certain cases of MCQN}
+\label{subsec:topics:enhanced-robust-sclp}
+
+A Robust Solution is feasible for any value of parameters realized from the
+uncertainty set.
+This includes the worst case values,
+meaning the parameters for which the solution is furthest from optimal.
+The uncertainty sets do not require any knowledge or assumptions about the distributions of the parameters.
+In many situations,
+it may be possible to make use of other information about the parameters,
+to obtain a more optimal solution.
+In Bertsimas' model,
+the service times for a job class can be anywhere from the nominal service time $\bar{\tau}$
+to the deviation service time $\tilde{\tau}$.
+A robust solution must be feasible if the realized time $\tau(t)=\tilde{\tau}$,
+meaning that the control policy allows us to process jobs at the corresponding rate $1/\tilde{\tau}$.
+We must also allow for the service time $\tau(t) < \tilde{\tau}$,
+meaning we are not processing jobs as fast as the server is capable.
+However,
+if we change the policy to speed up the server,
+it may outrun the buffer which is not allowed to go below zero.
+Therefore,
+a robust policy must attenuate the service rate.
+
+In Bertsimas model,
+the ``sequencing policy'' decides on the priority of the job as it arrives.
+In some cases,
+for example the Workload Placement Problem,
+instead of the service rate per class,
+our control is over the server effort per class,
+or the percent of CPU to dedicate to that class.
+The robust policy enforces constraints on the buffers,
+such that they must be non-negative for all possible realizations of the parameters.
+However,
+in some examples such as the Workload Placement Problem,
+the server can handle empty buffers by not working on this buffer.
+This means that constraints non-negativity of buffers under all possible realizations of the parameters could be relaxed.
+We believe that such relaxation will achieve a better objective value.
+We have some preliminary experimental results in \Cref{sec:results}.
+
+
+\subsection{Iterative Algorithm for Solving MCQN with Uncertain Parameters}
+\label{subsec:topics:iterative}
+
+As we've seen,
+the robust optimal solution will not be optimal for every realization of the parameters.
+It must be feasible for every possible realization from the uncertainty set.
+When there is little prior knowledge about the parameters
+the uncertainty set may be too conservative.
+By this,
+we mean that the feasible region is too small,
+due to the additional constraints imposed by a large uncertainty set.
+
+We propose to develop an iterative algorithm that at each step
+alternates between producing a near-optimal solution,
+and learning some parameters from running it.
+Our approach will be based on the \gls{mab}.
+We begin by choosing one feasible solution,
+such as the robust optimal policy.
+We run the system using this policy over the time interval which we call $[0,T]$.
+During this time we observe the job arrivals and processing times.
+We choose a threshold value $\epsilon$
+and run an iterative algorithm such the following algorithm:
+
+\begin{algorithmic}[0]
+    \Loop
+        \State choose a random number $u$ from $U(0,1)$
+        \If $u < 1 - \epsilon$
+            \State keep the same solution
+        \Else
+            \State update the job classes and parameters based observed data
+            \State generate a new solution
+        \EndIf
+    \EndLoop
+\end{algorithmic}
+
+We hope to develop this algorithm so that we can produce better solutions to problems when more data becomes available.
 
 
 % =============================================================================
@@ -787,6 +1031,19 @@ which is not far off the deterministic value.
     we have $\mathbb{E}(Z^*) \to Z$.
 \end{claim}
 
+
+\section{TODOs}
+
+\begin{enumerate}
+    \item after preliminary results, research questions
+    \item theory is background
+    \begin{enumerate}
+        \item mcqn, fluid approximation is sclp
+        \item sclp
+        \item robust sclp of bertsimas
+        \item statistical tools for fluid processing networks under uncertainty
+    \end{enumerate}
+\end{enumerate}
 
 \clearpage
 \printbibliography
