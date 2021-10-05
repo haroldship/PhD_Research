@@ -586,22 +586,34 @@ one must know the current state of all the queues on that server,
 and also the states of other servers that feed into and out of the server.
 These problems quickly become large and difficult to solve.
 
-Most often,
-the processing times and arrival rates are known with some degree of uncertainty.
-This adds further complexity to the problem.
-\autocite{bertsimas2014robust} lists several attempts to solve \gls{mcqn} with uncertain parameters.
-The problem can be formulated as a ``stochastic dynamic programming'' problem.
-However,
-this method is intractable for large problems.
+%Most often,
+%the processing times and arrival rates are known with some degree of uncertainty.
+%This adds further complexity to the problem.
+%\autocite{bertsimas2014robust} lists several attempts to solve \gls{mcqn} with uncertain parameters.
+%The problem can be formulated as a ``stochastic dynamic programming'' problem.
+%However,
+%this method is intractable for large problems.
+%
+%
+%\begin{itemize}
+%    \item stochastic dynamic programming,
+%    but problems quickly become intractable,
+%    \item Brownian approximation models and
+%    \item fluid approximations
+%\end{itemize}
 
-
-\begin{itemize}
-    \item stochastic dynamic programming,
-    but problems quickly become intractable,
-    \item Brownian approximation models and
-    \item fluid approximations
-\end{itemize}
-
+Real-life optimization problems often have uncertain parameters,
+that is, they are not known exactly.
+For fluid processing networks these are the job arrival and service rates.
+These rates can also vary over time.
+One way to deal with uncertain parameters is to apply a Robust Optimization methodology.
+Robust optimization considers that part of the problem parameters can deviate from their nominal values taking the values in the some set,
+called the uncertainty set.
+Based on the original (nominal) problem and on the uncertainty set Robust Optimization allows
+\Autocite{bertsimas2014robust} to develop such a model for
+%\gls{mcqn} with the fluid approximation.
+fluid processing networks.
+They consider budgeted uncertainty sets for the arrival and service rates.
 The realized arrival rates and service times for class $i$ are
 defined as $\lambda_i(t), \tau_i(t)$ respectively.
 For $t in [0,T]$,
@@ -622,9 +634,12 @@ $z_i(t)$ is defined as
 $\zeta_i(t)$ is defined analogously for $\lambda$.
 
 
-The Robust Counterpart requires additional sets of decision variables
-$\alpha, \beta$,
+As a result, they derive a Robust Counterpart that is also an SCLP problem,
 and is formulated in \Cref{eq:mcqn-robust-counterpart}.
+This problem requires additional decision variables $\alpha_i(t), \beta_i(t)$
+for $i=1,\ldots,I$ servers.
+These variables have no physical meaning,
+but are necessary for the robust formulation.
 
 \begin{align}
 \begin{split}
@@ -636,6 +651,7 @@ and is formulated in \Cref{eq:mcqn-robust-counterpart}.
     & \mathbf{u}(t), \mathbf{x}(t), \boldsymbol{\alpha}(t), \boldsymbol{\beta}(t) \geq \mathbf{0}, \quad \forall t
 \end{split}
 \end{align}
+
 
 
 % =============================================================================
@@ -661,26 +677,18 @@ For example,
 when $N=1$,
 we can estimate the mean arrival and processing rates.
 
-\subsection{Extension of the SCLP Simplex Algorithm to Budgeted Robust Optimization of MCQN}
+\subsection{Extension of the SCLP-Simplex Algorithm to Budgeted Robust Optimization of MCQN}
 \label{subsec:topics:robust-sclp-extension}
 
-The Robust Optimization strategy consists of defining the set of allowable
-values for the optimization parameters,
-called the uncertainty set.
-Next,
-we assign a nominal value to each of the parameters from within the uncertainty set.
-We then derive a new optimization problem,
-based on the original,
-called the Robust Counterpart.
-We then find the optimal value for the robust counterpart,
-called the Robust Optimal Solution.
 
-\Autocite{bertsimas2014robust} develop such a model for \gls{mcqn},
-based on the fluid approximation.
-
-Because the solution is large,
-they solve it by discretizing the time interval,
-and solving it as an LP problem.
+The solution method for the SCLP problem of \autocite{bertsimas2014robust}
+is an algorithm of \autocite{luo1998new}
+that is based on time discretization and quadratic programming.
+However,
+\autocite{shindin2021application} show that solution methods based on time discretization are not good for the following reasons {reasons here}.
+Alternatively, one can use the SCLP-simplex \autocite{weiss2008simplex}
+or the Revised SCLP-simplex \autocite{shindin2021application}
+algorithm to solve this kind of problem.
 There are several disadvantages to this approach.
 There is a trade-off between optimality of the solution and computation time,
 controlled by the fineness of the discretization,
@@ -693,7 +701,7 @@ The main problem with the current algorithm is that the budgeted constraints res
 degenerate SCLP problem.
 The Simplex-type algorithm is designed to handle degeneracy.
 Our research will focus on developing an algorithm,
-based on Simplex SCLP,
+based on SCLP-simplex,
 that can solve degenerate problems.
 
 \begin{align}
@@ -711,12 +719,11 @@ decision variables.
 In LP,
 the standard way to handle degeneracy is to perturb the right-hand-side
 of the constraints with small values.
-In SCLP,
-this may produce intervals that are too short to use.
+However In SCLP, this may produce a large number of short intervals.
 To avoid this issue,
 we plan to develop another strategy to resolve the degeneracy in SCLP.
-One possibility is based on \gls{mwua},
-which was has been used to solve Linear Programming and Graph Flow optimization problems \autocite{arora2012multiplicative}.
+%One possibility is based on \gls{mwua},
+%which was has been used to solve Linear Programming and Graph Flow optimization problems \autocite{arora2012multiplicative}.
 
 \subsection{Enhanced, Relaxed Robust SCLP for certain cases of MCQN}
 \label{subsec:topics:enhanced-robust-sclp}
