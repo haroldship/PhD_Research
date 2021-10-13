@@ -39,7 +39,7 @@
 
 % biblatex for references
 \usepackage{csquotes} % ensures biblatex quotes things correctly
-\usepackage[backend=biber,style=apa,autocite=inline]{biblatex}
+\usepackage[backend=biber,style=apa,autocite=inline,maxcitenames=3]{biblatex}
 \DeclareLanguageMapping{english}{english-apa}
 \addbibresource{personal_bibliography.bib}
 
@@ -300,7 +300,7 @@
     to improve on \autocite{bertsimas2014robust} robust model for \gls{mcqn} optimal control problems where the natural control variables are server effort (\Cref{subsec:topics:enhanced-robust-sclp}),
     develop an iterative method for simultaneously optimizing a \gls{mcqn} and learning its parameters (\Cref{subsec:topics:iterative}),
     and extend \gls{sclp}-Simplex for piece-wise constant arrival rates and processing times,
-    including estimatation of these parameters (\Cref{subsec:topics:sclp-piecewise}).
+    including estimation of these parameters (\Cref{subsec:topics:sclp-piecewise}).
     In \cref{sec:results} we present some preliminary results.
 
 
@@ -437,8 +437,8 @@
 
         \begin{align}
             \begin{split}
-                \min\limits_{u}
-                &~ = \int_0^T c^\top \eta(t) \mathrm{d}t \\
+                \min\limits_{\eta}
+                &~ = \int_0^T c^\top x(t) \mathrm{d}t \\
                 \text{s.t.}
                 &~ \int_0^t G \eta(s) \mathrm{d}s \leq \alpha + a t \\
                 &~ H \eta(t) \leq b \\
@@ -603,7 +603,7 @@
     They consider budgeted uncertainty sets for the arrival and service rates.
     The realized arrival rates and service times for class $i$ are
     defined as $\lambda_i(t), \tau_i(t)$ respectively.
-    For $t in [0,T]$,
+    For $t \in [0,T]$,
     $\tau_i(t) \in [\bar{\tau}_i, \tilde{\tau}_i]$ and
     $\lambda_i(t) \in [\bar{\lambda}_i, \tilde{\lambda}_i]$.
     Call $\bar{\tau}_i$ and $\bar{\lambda}_i$ the nominal arrival rate and service time.
@@ -642,11 +642,11 @@
     \begin{align}
         \begin{split}
             \label{eq:mcqn-robust-counterpart}
-            \min & \int_{0}^{T} \mathbf{c}^{\prime} \mathbf{x}(t) d t \\
-            \text { s.t. } & \int_{0}^{t} \mathbf{A} \mathbf{u}(s) d s+\mathbf{x}(t)=\mathbf{x}(0)+\overline{\boldsymbol{\lambda}} t, \quad \forall t \\
+            \min & \int_{0}^{T} {c}^{\top} {x}(t) d t \\
+            \text { s.t. } & \int_{0}^{t} G {u}(s) d s+{x}(t)={x}(0)+\overline{{\lambda}} t, \quad \forall t \\
             & \Gamma_{j} \beta_{j}(t)+\sum_{i: s(i)=j}\left(\bar{\tau}_{i} u_{i}(t)+\alpha_{i}(t)\right) \leq 1, \quad \forall j, t, \\
-            & \alpha_{i}(t)+\beta_{j}(t)-u_{i}(t) \tilde{\tau}_{i} \geq 0, \forall j, i \text { with } s(i)=j, \quad \forall t \\
-            & \mathbf{u}(t), \mathbf{x}(t), \boldsymbol{\alpha}(t), \boldsymbol{\beta}(t) \geq \mathbf{0}, \quad \forall t
+            & \alpha_{i}(t)+\beta_{j}(t)-u_{i}(t) \tilde{\tau}_{i} \geq 0, \forall j, i \text { when server~} i=j, \quad \forall t \\
+            & {u}(t), {x}(t), {\alpha}(t), {\beta}(t) \geq {0}, \quad \forall t
         \end{split}
     \end{align}
 
@@ -680,8 +680,7 @@
 
     In the case where the uncertainty set and nominal value of the parameters is known,
     but there is still some uncertainty about how they will be realized,
-    we hope to show that
-
+    a robust optimization method is often used to produce a working policy.
     The solution method for the SCLP problem (\ref{eq:mcqn-robust-counterpart}) suggested in \autocite{bertsimas2014robust}
     is an algorithm of \autocite{luo1998new}
     that is based on time discretization and quadratic programming.
@@ -698,9 +697,12 @@
     Alternatively, one can use the SCLP-simplex \autocite{weiss2008simplex}
     or the Revised SCLP-simplex \autocite{shindin2021application}
     algorithm to solve this kind of problem.
-    However, in the  robust  counterpart of the uncertain SCLP problem with budgeted uncertainty set (\ref{eq:mcqn-robust-counterpart}) third set of constraints has zero-valued right-hand-side.
-    This means that the resulting SCLP problem is degenerate and neither SCLP-simplex,
-    nor revised SCLP-simplex are designed to deal with degenerate SCLP problems.
+    However,
+    in the  robust  counterpart of the uncertain SCLP problem with budgeted uncertainty set (\ref{eq:mcqn-robust-counterpart}),
+    third set of constraints $\alpha_{i}(t)+\beta_{j}(t)-u_{i}(t) \tilde{\tau}_{i} \geq 0$
+    has zero-valued right-hand-side for some values of $i,j$.
+    This means that the resulting SCLP problem is degenerate and neither SCLP-Simplex,
+    nor revised SCLP-Simplex are designed to deal with degenerate SCLP problems.
     In LP,
     the standard way to handle degeneracy is to perturb the right-hand-side
     of the constraints with small values.
@@ -735,8 +737,8 @@
     where the control variables are formulated directly as a percent of the server effort,
     and derive robust counterparts for this problem formulation for a variety of uncertainty set shapes,
     including  box, budgeted and polyhedral uncertainty sets.
-    We believe that the corresponding robust counterparts will be \gls{sclp} problems as well.
-    We believe that the value of the holding cost objective for this formulation will always be as low as or lower than the sequencing-policy formulation.
+    We conjecture that the corresponding robust counterparts will be \gls{sclp} problems as well.
+    We conjecture that the value of the holding cost objective for this formulation will always be as low as or lower than the sequencing-policy formulation.
     We plan to demonstrate this by comparing the feasible regions of the corresponding robust counterparts,
     and showing that the proposed model's region contains the feasible region of Bertsimas' model.
 
@@ -745,8 +747,9 @@
     meaning the parameters for which the solution is furthest from optimal.
     The uncertainty sets do not require any knowledge or assumptions about the distributions of the parameters.
     In many situations,
-    it may be possible to make use of other information about the parameters,
-    to obtain a more optimal solution.
+    it may be possible to make use of other information about the parameters
+    to obtain a better solution,
+    because the smaller uncertainty sets result in larger feasible regions.
     We plan to use the expected values of the arrival and service rates in order to build the relaxed \gls{sclp} problem mentioned above and investigate the quality of the resulting policy under different distributions of these rates.
 
 
@@ -756,7 +759,7 @@
     in some examples such as the Workload Placement Problem,
     the server can handle empty buffers by simply not working on this buffer.
     This means that we can relax the constraints that require the buffers to be non-negative under all possible realizations of the parameters.
-    We believe that such a relaxation will achieve an as-good or better objective value,
+    We conjecture that such a relaxation will achieve an as-good or better objective value,
     because a relaxation of the constraints increases the feasible region.
     We hope to show that under certain conditions,
     % {\color{red} such as that the primary source of uncertainty is deviation from the nominal over time,}
@@ -797,39 +800,53 @@
     We begin with
     an initial control policy,
     such as the robust control policy if one exists,
-    based on the the uncertainty set of the parameters.
+    based on the uncertainty set of the parameters.
     This policy would be optimal according to the initial knowledge about the uncertain parameters,
     and moreover,
     it would allow for the system to be deployed and run.
     Before running it,
     however,
-    we perform a sensitivity analysis on the uncertain parameters in order to discover which parameters have the greatest effect the objective.
+    we perform a sensitivity analysis on the uncertain parameters in order to discover which parameters have the greatest effect on the objective.
     We plan to develop statistical methods to perform the estimation of the uncertainty set and expected values of those parameters.
     These methods will result in a control policy that enables us to estimate the parameters in some confidence intervals.
     This policy has a price which can be calculated from the objective function of the optimization problem.
     Next,
     we create a combined policy by taking the weighted sum of estimator policy and the robust policy,
     using weights which we set.
-    There is an inherent trade-off between the estimator policy and the robust policy.
-    On the one hand,
-    the estimator policy will often be closer to optimal,
-    given that the robust solution covers the worst case.
-    On the other hand,
-    the estimator policy will enable better parameter estimation.
+    % There is an inherent trade-off between the estimator policy and the robust policy.
+    % On the one hand,
+    % the estimation policy will often be closer to optimal,
+    % given that the robust solution covers the worst case.
+    % On the other hand,
+    % the estimation policy will enable better parameter estimation.
     We run the system over a period $[0,T]$,
     and measure the number of job arrivals and completions for each class.
     We use these to estimate the expectations and/or uncertainty sets for the arrival rates and processing times $\hat{\lambda}_j, \hat{\tau}_j$ for each class $j$,
     and then generate a new robust policy based on the estimated parameters.
 
 
-    The method we use to compute the estimator policy will be investigated as part of this research topic.
-    Since the SCLP-Simplex algorithm is centered on an \gls{ode} containing our parameters,
-    we plan to base our parameter estimation approach on the direct integral method \autocite{dattner2015optimal,dattner2015model,yaari2018simode}.
-    We believe this method will allow us to estimate the parameters in our partially observed system,
-    because although it is not hard to estimate the arrival rates $\lambda$,
-    the processing times or rates for job classes may be difficult to measure directly.
-    Instead,
-    we usually must measure the length of each queue $x(t)$.
+    The method we use to compute the estimation policy will be investigated as part of this research topic.
+    The SCLP-Simplex algorithm is centered on an \gls{ode} containing our parameters,
+    which we derive from the constraint equation:
+    $$
+    \int_{0}^{t} G {u}(s) d s+{x}(t)={x}(0)+\overline{{\lambda}} t, \quad \forall t
+    $$
+    to obtain
+    $$
+    \frac{\mathrm{d}x}{\mathrm{d}t} = \overline{{\lambda}} - G {u}(s) \text{.}
+    $$
+
+    Since the matrix $G$ is linear in $\mu=1/\tau$,
+    we have a \gls{ode} that is linear in its parameters.
+    However,
+    while we can easily estimate $\lambda$ by observing arrival directly,
+    we usually cannot estimate $\mu$ or $\tau$ and must usually suffice with observing the queue lengths $x(t)$.
+    Estimating parameters of such \glspl{ode} can be carried out efficiently,
+    both computationally and statistically,
+    using the methods developed in
+    \autocite{dattner2020separable,dattner2015optimal,dattner2015model,Yaari2019,dattner2018application,vujavcic2018consistency}.
+    Further,
+    we plan to extend the methodology and theory developed in the aforementioned papers to the specific statistical and mathematical modeling framework considered in our proposal.
 
     We can repeat this process until we are satisfied with the parameter estimates.
 
@@ -853,7 +870,8 @@
 
     \subsubsection{Extension of parameter estimation methods}
     We expect that estimating these piece-wise constant parameters when they are known with some degree of uncertainty will be challenging.
-    We plan to investigate changepoint detection algorithms and other time series analysis techniques in combination with parameter estimation for \glspl{ode} based on the direct integral method \autocite{dattner2015optimal,dattner2015model,yaari2018simode}, in order to estimate the locations and values of the changes of the ``pieces''.
+    We plan to investigate changepoint detection algorithms and other time series analysis techniques in combination with parameter estimation for \glspl{ode} based on the direct integral method,
+    in order to estimate the locations and values of the changes of the ``pieces''.
 
     % =============================================================================
     % Preliminary Results
@@ -866,6 +884,10 @@
 
     This section describes the preliminary experimental work towards the research topic \Cref{subsec:topics:robust-sclp-extension},
     which we performed using the setup of \Cref{ex:one-computer-two-classes-concrete}.
+
+    \subsection{Robust Model based on Server Effort}
+    \label{subsec:results:server-effort-model}
+
     We begin by comparing our proposed model,
     which we call \modelone,
     to Bertsimas' model,
@@ -873,8 +895,7 @@
     First, we show that the two deterministic versions of the model are equivalent.
     Then,
     we look at what happens when we introduce some uncertainty to the processing time parameter $\tau$.
-    Then we show how we can make adjustments to \modelone that improve the objective significantly.
-
+    Then we show how we can make adjustments to \modelone~ that improve the objective significantly.
 
     First we solve the deterministic version of our \modelone.
     This model uses the fraction of effort $\eta$ on the server as the decision variables.
@@ -894,7 +915,7 @@
     The optimal solution,
     obtained using the SCLP-Python solver \autocite{Shindin_SCLPPython_2021},
     has the server applying $100\%$ effort on class 1 jobs for the first $5$ hours,
-    then $66.67\%$ on class 1 and 33.33\% on class 2 for the last 5 seconds.
+    then $66.67\%$ on class 1 and 33.33\% on class 2 for the last 5 hours.
     The value of the objective is $2145.83$.
 
     We define a second model,
@@ -983,18 +1004,18 @@
     because should the processing rate turn out to be higher than the worst case,
     our job queue may be empty when we have scheduled server effort for that class.
     To compensate,
-    we the following adjustment to \Cref{eq:model-2-translation} for $\epsilon=0.1$:
+    we the following adjustment to \Cref{eq:model-2-translation} for $\epsilon=0.2$:
     \begin{align}
         \label{eq:model-2-translation-robust}
         \begin{split}
-            \eta_1(t) & = 60(0.95) u_1(t) ~ \text{and} \\
-            \eta_2(t) & = 25(0.95) u_2(t).
+            \eta_1(t) & = 60(0.9) u_1(t) ~ \text{and} \\
+            \eta_2(t) & = 25(0.9) u_2(t).
         \end{split}
     \end{align}
 
     \begin{figure}
         \centering
-        \includegraphics{tau_t.png}
+        \includegraphics[width=0.9\textwidth]{tau_t.png}
         \caption{A realization of $\tau_1(t)$ (orange) and $\tau_2(t)$ (blue).}
         \label{fig:tau-realization}
     \end{figure}
@@ -1016,9 +1037,8 @@
 
     We generate realizations of $\zeta_j(t)$ once,
     and use them for all of the following steps
-    to compute simulated realizations of $\bar{\tau_j}(t)$,
-    which we call $\tau_j(t)$.
-    We then compute the simulated buffer quantities using $\tau_j(t)$:
+    to compute simulated realizations of $\tau_j(t)$.
+    We then compute the simulated buffer quantities:
 
     \begin{align}
         \label{eq:buffer-robust-realization}
@@ -1076,9 +1096,13 @@
         Then $Z_1(\tau^*(t)) < Z_2(\tau^*(t))$.
     \end{claim}
 
-    We plan to prove \Cref{claim:modelone-better} by comparing the feasible regions of the corresponding robust counterparts,and showing that the proposed model’s region contains the feasible region ofBertsimas’ model.
+    We plan to prove \Cref{claim:modelone-better} by comparing the feasible regions of the corresponding robust counterparts,and showing that the proposed model’s region contains the feasible region of Bertsimas’ model.
 
-    We now suggest an alternative method of obtaining an optimal solution.
+    \subsection{Relaxing Constraints on the Robust Server Effort Model}
+
+    We now suggest an alternative method of obtaining an optimal solution,
+    which we conjecture will further improve upon the model of
+    \Cref{subsec:results:server-effort-model}.
     Recall that the constraints in \Cref{ex:one-computer-two-classes-concrete}
     are of two kinds:
     server effort constraints,
